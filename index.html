@@ -531,7 +531,7 @@ function renderMetricShareUI(){ var short=state.progressSubject; els.shareSubjec
   bindMetricCheckboxes(); updateSharePreview(); }
 function bindMetricCheckboxes(){ var boxes=document.getElementsByName('metricShare'); for(var i=0;i<boxes.length;i++){ boxes[i].addEventListener('change', updateSharePreview); } }
 function selectedMetricKeys(){ var out=[], boxes=document.getElementsByName('metricShare'); for(var i=0;i<boxes.length;i++){ if(boxes[i].checked) out.push(boxes[i].value); } return out; }
-function formatMetricsText(subjectShort, keys, full){ var sub=progressStore[subjectShort]||emptySubject(); var ov=sub.overall; var exam=getCombinedExamStats(sub); var answered=ov.answered; var acc=answered?(ov.correct/answered*100):0; var fail=answered?(ov.wrong/answered*100):0; var lines=[]; var name=getStudentName(false); if(name) lines.push('Alumno: '+name); lines.push('Asignatura: '+subjectShort); if(full) lines.push('');
+function formatMetricsText(subjectShort, keys, full){ var sub=progressStore[subjectShort]||emptySubject(); var ov=sub.overall; var exam=getCombinedExamStats(sub); var answered=ov.answered; var acc=answered?(ov.correct/answered*100):0; var fail=answered?(ov.wrong/answered*100):0; var lines=[]; lines.push('Asignatura: '+subjectShort); if(full) lines.push('');
   var map={ sessions:'Sesiones: '+ov.sessions, accuracy:'% de acierto: '+acc.toFixed(1)+'%', failure:'% de fallo: '+fail.toFixed(1)+'%', answered:'Preguntas respondidas: '+ov.answered, time:'Tiempo total: '+Math.round(ov.totalTimeMs/60000)+' min', days:'Días de estudio: '+Object.keys(ov.days).length, examBest:'Mejor nota examen: '+(typeof exam.bestScore==='number'?exam.bestScore.toFixed(2):'-'), examAvg:'Nota media examen: '+(exam.sessions?(exam.totalScore/exam.sessions).toFixed(2):'-'), examLast:'Última nota examen: '+(typeof exam.lastScore==='number'?exam.lastScore.toFixed(2):'-') };
   for(var i=0;i<keys.length;i++){ if(map[keys[i]]) lines.push(map[keys[i]]); }
   if(full){ lines.push(''); lines.push('Por secciones:'); var keys2=getModeKeysForSubject(subjectShort); for(var j=0;j<keys2.length;j++){ var mk=keys2[j], m=sub.modes[mk] || emptyMode(), a=m.answered?(m.correct/m.answered*100):0; lines.push('- '+MODES[mk].title+': '+m.sessions+' intentos · '+a.toFixed(1)+'% acierto'); } }
@@ -570,11 +570,9 @@ function detectQuestionOrigin(item){
 function buildQuestionShareText(){
   var item=state.sessionItems[state.currentIndex];
   if(!item) return '';
-  var name=getStudentName(false);
   var lines=[];
   lines.push('REPORTE DE POSIBLE ERROR EN PREGUNTA');
   lines.push('');
-  if(name) lines.push('Alumno: '+name);
   lines.push('Asignatura: '+state.subject.short);
   lines.push('Modo actual: '+MODES[state.mode].title);
   lines.push('Origen de la pregunta: '+detectQuestionOrigin(item));
@@ -592,7 +590,7 @@ function buildQuestionShareText(){
   lines.push('Observación: Creo que esta pregunta o su respuesta correcta puede estar mal revisada.');
   return lines.join('\n');
 }
-function buildActivityShareText(){ var sum=state.lastSummary; if(!sum) return ''; var name=getStudentName(true); var lines=[]; if(name) lines.push('Alumno: '+name); lines.push('Asignatura: '+state.subject.short); lines.push('Modo: '+MODES[state.mode].title); lines.push('Aciertos: '+sum.correct); lines.push('Errores: '+sum.wrong); lines.push('Sin contestar: '+sum.blank); if(typeof sum.score==='number') lines.push('Nota: '+sum.score.toFixed(2)); return lines.join('\n'); }
+function buildActivityShareText(){ var sum=state.lastSummary; if(!sum) return ''; var lines=[]; lines.push('Asignatura: '+state.subject.short); lines.push('Modo: '+MODES[state.mode].title); lines.push('Aciertos: '+sum.correct); lines.push('Errores: '+sum.wrong); lines.push('Sin contestar: '+sum.blank); if(typeof sum.score==='number') lines.push('Nota: '+sum.score.toFixed(2)); return lines.join('\n'); }
 function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function resetHome(){ state.subject=null; state.mode=null; state.sessionItems=[]; state.answers=[]; state.currentIndex=0; state.selectedPracticeCaseIndex=null; hidePracticePicker(); showScreen('home'); }
 function backSubject(){ hidePracticePicker(); if(state.subject){ renderModeMenu(); showScreen('menu'); } else resetHome(); }
@@ -604,10 +602,10 @@ function init(){ createAuthUi(); updateAuthUi(); setupFirebase(); renderSubjects
   els.listQuizBtn.addEventListener('click', function(){ renderQuestionListScreen('cuestionario'); }); els.listPracticeBtn.addEventListener('click', function(){ renderQuestionListScreen('practicas'); }); if(els.listExam1Btn){ els.listExam1Btn.addEventListener('click', function(){ renderQuestionListScreen('examen1'); }); } els.listBackBtn.addEventListener('click', backSubject); els.listHomeBtn.addEventListener('click', resetHome);
   els.practiceRandomBtn.addEventListener('click', function(){ startPracticeCase(null); }); els.practiceBackBtn.addEventListener('click', hidePracticePicker);
   els.homeTopBtn.addEventListener('click', resetHome); els.homeBtn.addEventListener('click', resetHome); els.subjectBtn.addEventListener('click', backSubject); els.repeatBtn.addEventListener('click', function(){ startMode(state.mode); }); els.nextBtn.addEventListener('click', nextQuestion); els.exitBtn.addEventListener('click', function(){ if(window.confirm('¿Salir de la sesión? Perderás el progreso actual.')) resetHome(); }); els.themeBtn.addEventListener('click', toggleTheme); els.shareQuestionBtn.addEventListener('click', function(){ var txt=buildQuestionShareText(); if(txt) shareText(txt); }); els.shareActivityBtn.addEventListener('click', function(){ var txt=buildActivityShareText(); if(txt) shareText(txt); }); els.showStudyInfoBtn.addEventListener('click', function(){ var open = els.studyInfoBox.classList.contains('active'); els.studyInfoBox.className = open ? 'info-box' : 'info-box active'; els.registerInfoBox.className = 'info-box'; }); els.showRegisterInfoBtn.addEventListener('click', function(){ var open = els.registerInfoBox.classList.contains('active'); els.registerInfoBox.className = open ? 'info-box' : 'info-box active'; els.studyInfoBox.className = 'info-box'; }); els.toggleInfoBtn.addEventListener('click', function(){ els.sectionTag.style.display = els.sectionTag.style.display==='none' ? 'block' : 'none'; });
-  els.shareRegistryTopBtn.addEventListener('click', function(){ var name=getStudentName(true); if(!name) return; var pieces=[]; var avail=getAvailableSubjects(); for(var i=0;i<avail.length;i++){ pieces.push(formatMetricsText(avail[i].short, ['sessions','accuracy','failure','answered','time','days','examBest','examAvg','examLast'], true)); pieces.push(''); } shareText(pieces.join('\n')); });
+  els.shareRegistryTopBtn.addEventListener('click', function(){ var pieces=[]; var avail=getAvailableSubjects(); for(var i=0;i<avail.length;i++){ pieces.push(formatMetricsText(avail[i].short, ['sessions','accuracy','failure','answered','time','days','examBest','examAvg','examLast'], true)); pieces.push(''); } shareText(pieces.join('\n')); });
   els.selectAllMetricsBtn.addEventListener('click', function(){ var boxes=document.getElementsByName('metricShare'); for(var i=0;i<boxes.length;i++){ boxes[i].checked=true; } updateSharePreview(); });
-  els.shareMetricsNowBtn.addEventListener('click', function(){ var name=getStudentName(true); if(!name) return; shareText(formatMetricsText(state.progressSubject, selectedMetricKeys(), false)); });
-  els.downloadTxtBtn.addEventListener('click', function(){ var name=getStudentName(true); if(!name) return; downloadText('registro_'+state.progressSubject+'_'+name.replace(/\s+/g,'_')+'.txt', formatMetricsText(state.progressSubject, selectedMetricKeys(), false)); });
+  els.shareMetricsNowBtn.addEventListener('click', function(){ shareText(formatMetricsText(state.progressSubject, selectedMetricKeys(), false)); });
+  els.downloadTxtBtn.addEventListener('click', function(){ downloadText('registro_'+state.progressSubject+'.txt', formatMetricsText(state.progressSubject, selectedMetricKeys(), false)); });
   showScreen('home');
 }
 init();
