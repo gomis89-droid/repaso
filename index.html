@@ -547,9 +547,11 @@ async function applyCloudProgress(user){
   renderAfterProgressRefresh();
 }
 function renderAfterProgressRefresh(){
+  renderSubjects();
   if(state.progressSubject) renderProgress();
   if(document.getElementById('screen-list').classList.contains('active') && state.subject && state.mode){ renderQuestionListScreen(state.mode); }
 }
+
 async function signInWithGoogle(){
   if(!isFirebaseConfigured()){ alert('Primero tienes que pegar la configuración de Firebase dentro del archivo HTML.'); return; }
   try{
@@ -706,7 +708,7 @@ function buildQuestionShareText(){
 }
 function buildActivityShareText(){ var sum=state.lastSummary; if(!sum) return ''; var lines=[]; lines.push('Asignatura: '+state.subject.short); lines.push('Modo: '+MODES[state.mode].title); lines.push('Aciertos: '+sum.correct); lines.push('Errores: '+sum.wrong); lines.push('Sin contestar: '+sum.blank); if(typeof sum.score==='number') lines.push('Nota: '+sum.score.toFixed(2)); return lines.join('\n'); }
 function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function resetHome(){ state.subject=null; state.mode=null; state.sessionItems=[]; state.answers=[]; state.currentIndex=0; state.selectedPracticeCaseIndex=null; hidePracticePicker(); showScreen('home'); }
+function resetHome(){ state.subject=null; state.mode=null; state.sessionItems=[]; state.answers=[]; state.currentIndex=0; state.selectedPracticeCaseIndex=null; hidePracticePicker(); renderSubjects(); showScreen('home'); }
 function backSubject(){ hidePracticePicker(); if(state.subject){ renderModeMenu(); showScreen('menu'); } else resetHome(); }
 function toggleTheme(){ var isDark=document.body.className==='dark'; document.body.className=isDark?'':'dark'; if(document.documentElement) document.documentElement.className=isDark?'':'dark'; }
 function init(){ createAuthUi(); updateAuthUi(); setupFirebase(); renderSubjects();
