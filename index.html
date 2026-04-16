@@ -1404,7 +1404,31 @@ init();
         durationMs: guestDurationMs(meta.startedAt),
         ua: navigator.userAgent||'',
         activeNow: forceInactive ? false : true,
+        convertedToAuth: false,
         lastPath: (location.hash||location.pathname||'').slice(0,120)
+      },{merge:true});
+      noteEstimatedWrites(1);
+    }catch(e){}
+  }
+  function markGuestSessionConverted(user){
+    if(!window.db || !user) return;
+    try{
+      var meta=getGuestSessionMeta();
+      var sessionId=guestTracker.sessionId || (meta && meta.sessionId) || '';
+      var startedAt=guestTracker.startedAt || (meta && meta.startedAt) || '';
+      if(!sessionId) return;
+      window.db.collection(GUEST_COLLECTION).doc(sessionId).set({
+        visitorId: guestTracker.visitorId || getGuestVisitorId(),
+        sessionId: sessionId,
+        startedAt: startedAt || new Date().toISOString(),
+        lastSeen: new Date().toISOString(),
+        durationMs: guestDurationMs(startedAt),
+        activeNow: false,
+        convertedToAuth: true,
+        convertedAt: new Date().toISOString(),
+        authUid: user.uid || '',
+        authEmail: user.email || '',
+        displayName: user.displayName || user.email || 'Usuario autenticado'
       },{merge:true});
       noteEstimatedWrites(1);
     }catch(e){}
@@ -1427,9 +1451,9 @@ init();
     recordGuestConnection(false);
     guestTracker.interval=setInterval(function(){ recordGuestConnection(false); },180000);
   }
-  function stopGuestTracking(){
+  function stopGuestTracking(skipFinalWrite){
     if(guestTracker.interval){ clearInterval(guestTracker.interval); guestTracker.interval=null; }
-    if(guestTracker.active) recordGuestConnection(true);
+    if(guestTracker.active && !skipFinalWrite) recordGuestConnection(true);
     guestTracker.active=false;
   }
 
@@ -1516,6 +1540,74 @@ init();
   ].join('');
   document.head.appendChild(style);
 
+  var adminVisualStyle=document.createElement('style');
+  adminVisualStyle.textContent=[
+    '#adminOverlay{padding:22px;background:rgba(2,6,23,.58);backdrop-filter:blur(10px);}',
+    '#adminModal{width:min(1180px,100%);max-height:92dvh;border-radius:28px;border:1px solid rgba(148,163,184,.22);box-shadow:0 30px 120px rgba(2,6,23,.38);}',
+    '#adminHead{padding:22px 26px 18px;background:linear-gradient(180deg,var(--panel2),var(--panel));}',
+    '#adminHead h3{font-size:28px;line-height:1.05;}',
+    '#adminHead small{font-size:13px;margin-top:6px;}',
+    '#adminClose{width:38px;height:38px;font-size:20px;background:var(--panel);}',
+    '#adminTabs{gap:10px;padding:14px 26px;border-bottom:1px solid var(--line);background:var(--panel);}',
+    '.admin-tab{padding:12px 18px;border-radius:16px;border:1px solid var(--line);background:var(--panel);font-size:14px;font-weight:700;margin-bottom:0;}',
+    '.admin-tab.active{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 8px 24px rgba(var(--accent-rgb),.28);}',
+    '#adminBody{padding:24px 26px 28px;background:linear-gradient(180deg,var(--panel),var(--bg));}',
+    '.admin-page{display:grid;gap:18px;}',
+    '.admin-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}',
+    '.admin-kpi{border:1px solid var(--line);border-radius:22px;padding:18px;background:var(--panel);box-shadow:var(--shadow-sm);}',
+    '.admin-kpi-label{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}',
+    '.admin-kpi-value{font-family:"Outfit",sans-serif;font-size:34px;font-weight:800;line-height:1.05;margin-top:8px;color:var(--text);}',
+    '.admin-kpi-sub{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.45;}',
+    '.admin-two-col{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:18px;align-items:start;}',
+    '.admin-section-card{border:1px solid var(--line);border-radius:24px;background:var(--panel);box-shadow:var(--shadow-sm);overflow:hidden;}',
+    '.admin-section-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}',
+    '.admin-section-head h4{margin:0;font-family:"Outfit",sans-serif;font-size:20px;font-weight:800;}',
+    '.admin-section-head .sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45;}',
+    '.admin-section-body{padding:18px 20px;}',
+    '.admin-stack{display:grid;gap:14px;}',
+    '.admin-mini-list{display:grid;gap:10px;}',
+    '.admin-mini-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);font-size:13px;}',
+    '.admin-mini-item strong{font-size:18px;font-family:"Outfit",sans-serif;}',
+    '.admin-day-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:4px 4px 0;}',
+    '.admin-list{display:grid;gap:12px;}',
+    '.admin-entry{border:1px solid var(--line);border-radius:22px;background:var(--panel);padding:16px;box-shadow:var(--shadow-sm);}',
+    '.admin-entry-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;}',
+    '.admin-entry-name{font-size:18px;font-weight:800;font-family:"Outfit",sans-serif;line-height:1.2;}',
+    '.admin-entry-sub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45;word-break:break-word;}',
+    '.admin-state{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap;}',
+    '.admin-state.ok{background:var(--okbg);color:var(--ok);}',
+    '.admin-state.warn{background:var(--warnbg);color:var(--warn);}',
+    '.admin-state.muted{background:var(--panel2);color:var(--muted);}',
+    '.admin-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:14px;}',
+    '.admin-chip-box{border:1px solid var(--line);border-radius:16px;background:var(--panel2);padding:12px 13px;font-size:12px;line-height:1.45;color:var(--muted);}',
+    '.admin-chip-box strong{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-weight:800;}',
+    '.admin-context{margin-top:12px;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:var(--panel);font-size:12px;line-height:1.55;color:var(--muted);word-break:break-word;}',
+    '.admin-context b{color:var(--text);}',
+    '.admin-users-grid{display:grid;gap:14px;}',
+    '.auc{border-radius:22px;background:var(--panel);box-shadow:var(--shadow-sm);}',
+    '.auc-header{padding:16px 18px;gap:12px;align-items:flex-start;}',
+    '.auc-avatar{width:42px;height:42px;font-size:16px;}',
+    '.auc-name{font-size:17px;font-family:"Outfit",sans-serif;font-weight:800;}',
+    '.auc-email{font-size:12px;margin-top:4px;}',
+    '.auc-stats{gap:8px;justify-content:flex-end;}',
+    '.auc-stat{padding:8px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:11px;}',
+    '.auc-detail{padding:0 18px 18px;border-top:none;}',
+    '.user-history{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;}',
+    '.hist-row{padding:9px 0;}',
+    '.quota-card{border-radius:24px;padding:18px;background:var(--panel);box-shadow:var(--shadow-sm);}',
+    '.quota-head{align-items:center;}',
+    '.quota-percent{font-size:38px;}',
+    '.quota-bar{height:14px;background:var(--panel2);}',
+    '.quota-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;font-size:13px;}',
+    '.quota-meta span{border:1px solid var(--line);border-radius:16px;padding:11px 12px;background:var(--panel2);}',
+    '.admin-empty{padding:26px;border:1px dashed var(--line);border-radius:20px;background:var(--panel2);font-size:14px;color:var(--muted);text-align:center;}',
+    '.admin-note{border:1px solid var(--line);border-radius:20px;background:var(--panel2);padding:16px;font-size:13px;line-height:1.55;color:var(--muted);}',
+    '.conn-row{display:block;padding:0;border-bottom:none;}',
+    '@media (max-width:980px){.admin-two-col{grid-template-columns:1fr;}#adminModal{width:min(980px,100%);}#adminHead h3{font-size:23px;}}',
+    '@media (max-width:700px){#adminOverlay{padding:10px;}#adminModal{max-height:96dvh;border-radius:22px;}#adminHead{padding:18px 16px 14px;}#adminTabs{padding:12px 16px;overflow:auto;}#adminBody{padding:18px 16px 22px;}.admin-kpi-grid{grid-template-columns:1fr 1fr;}.admin-entry-name{font-size:16px;}.quota-percent{font-size:28px;}}'
+  ].join('');
+  document.head.appendChild(adminVisualStyle);
+
   /* ── FAB ── */
   var fab=document.createElement('button');
   fab.id='adminFab'; fab.title='Admin'; fab.textContent='⚙';
@@ -1583,6 +1675,20 @@ init();
     if(typeof v!=='number') return '<span class="score-pill sp-muted">-</span>';
     var cls=v>=6?'sp-ok':v>=5?'sp-warn':'sp-bad';
     return '<span class="score-pill '+cls+'">'+v.toFixed(2)+'</span>';
+  }
+
+  function statePillHtml(label, type){
+    return '<span class="admin-state '+esc(type||'muted')+'">'+esc(label||'')+'</span>';
+  }
+  function kpiCard(label, value, sub){
+    return '<div class="admin-kpi"><div class="admin-kpi-label">'+esc(label)+'</div><div class="admin-kpi-value">'+value+'</div>'+(sub?'<div class="admin-kpi-sub">'+sub+'</div>':'')+'</div>';
+  }
+  function adminSection(title, subtitle, body, extra){
+    return '<section class="admin-section-card"><div class="admin-section-head"><div><h4>'+esc(title)+'</h4>'+(subtitle?'<div class="sub">'+subtitle+'</div>':'')+'</div>'+(extra||'')+'</div><div class="admin-section-body">'+body+'</div></section>';
+  }
+  function dayLabelEs(day, suffix){
+    var label=day==='sin-fecha'?'Sin fecha':new Date(day+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    return '<div class="admin-day-title">'+esc(label)+(suffix?' <span style="font-weight:500;text-transform:none;letter-spacing:0;">'+suffix+'</span>':'')+'</div>';
   }
   function deviceShort(ua){
     if(!ua) return '';
@@ -1660,17 +1766,15 @@ init();
     else if(code.indexOf('unavailable')!==-1) tips.push('Firestore no responde. Comprueba que Firestore Database está creado en Firebase Console.');
     else tips.push('Comprueba si Firestore Database está creado y las reglas están configuradas.');
     sub.textContent='Error de Firestore';
-    body.innerHTML=
-      '<div class="admin-box" style="margin-bottom:10px;">'
-      + '<div class="abox-label">Código</div><div class="abox-val" style="font-size:14px;word-break:break-all;">'+esc(code||'sin-código')+'</div>'
-      + '</div>'
-      + '<div class="admin-box" style="margin-bottom:10px;">'
-      + '<div class="abox-label">Mensaje</div><div style="font-size:13px;margin-top:6px;line-height:1.5;">'+esc(msg)+'</div>'
-      + '</div>'
-      + '<div class="admin-box">'
-      + '<div class="abox-label" style="margin-bottom:8px;">Qué revisar</div>'
-      + '<div style="font-size:13px;line-height:1.6;">'+tips.map(function(t){ return '• '+esc(t); }).join('<br>')+'</div>'
-      + '</div>';
+    body.innerHTML='<div class="admin-page">'
+      +adminSection('No se pudo cargar el panel','El diseño nuevo también muestra el detalle del error para que puedas corregirlo sin perder contexto.',
+        '<div class="admin-kpi-grid">'
+        +kpiCard('Código', esc(code||'sin-código'),'')
+        +kpiCard('Estado', 'Error','Firestore')
+        +'</div>'
+        +'<div class="admin-note" style="margin-top:14px;"><b>Mensaje:</b> '+esc(msg)+'</div>'
+        +'<div class="admin-note" style="margin-top:12px;"><b>Qué revisar:</b><br>'+tips.map(function(t){ return '• '+esc(t); }).join('<br>')+'</div>')
+      +'</div>';
   }
 
   /* ── USERS TAB ── */
@@ -1681,10 +1785,12 @@ init();
     body.innerHTML='<div class="admin-msg">⏳ Consultando Firestore...</div>';
     try{
       if(!window.db) throw {code:'db-unavailable',message:'Firestore no inicializado.'};
-      var [usSnap, psSnap] = await Promise.all([
+      var data=await Promise.all([
         window.db.collection('users').get(),
-        window.db.collection('progress').get()
+        window.db.collection('progress').get(),
+        getQuotaUsageSummary()
       ]);
+      var usSnap=data[0], psSnap=data[1], quota=data[2];
       var progByUid={};
       psSnap.forEach(function(d){ progByUid[d.id]=(d.data()||{}).progress||{}; });
       var users=[];
@@ -1708,101 +1814,65 @@ init();
       var globalAcc=totalAnswered?Math.round(totalCorrect/totalAnswered*1000)/10:0;
       sub.textContent=totalUsers+' usuario'+(totalUsers!==1?'s':'')+' registrado'+(totalUsers!==1?'s':'');
 
-      var html='';
-      /* summary */
-      html+='<div class="admin-summary">'
-        +'<div class="admin-box"><div class="abox-label">Total usuarios</div><div class="abox-val">'+totalUsers+'</div></div>'
-        +'<div class="admin-box"><div class="abox-label">Activos hoy</div><div class="abox-val">'+activeToday+'</div></div>'
-        +'<div class="admin-box"><div class="abox-label">Activos 7 días</div><div class="abox-val">'+active7d+'</div></div>'
-        +'<div class="admin-box"><div class="abox-label">Sesiones totales</div><div class="abox-val">'+totalSessions+'</div></div>'
-        +'<div class="admin-box"><div class="abox-label">Acierto global</div><div class="abox-val">'+globalAcc.toFixed(1)+'%</div></div>'
-      +'</div>';
+      var html='<div class="admin-page">'+renderQuotaWidget(quota)
+        +'<div class="admin-kpi-grid">'
+        +kpiCard('Total usuarios', String(totalUsers), 'Excluye tu cuenta admin')
+        +kpiCard('Activos hoy', String(activeToday), 'Con actividad en 24 h')
+        +kpiCard('Activos 7 días', String(active7d), 'Seguimiento reciente')
+        +kpiCard('Sesiones totales', String(totalSessions), 'Sumadas desde progress')
+        +kpiCard('Acierto global', globalAcc.toFixed(1)+'%', totalAnswered+' respuestas evaluadas')
+        +'</div>';
 
-      /* user list */
       if(!users.length){
-        html+='<div class="admin-msg">No hay usuarios registrados todavía.</div>';
+        html+=adminSection('Usuarios','Todavía no hay usuarios registrados en Firestore.','<div class="admin-empty">No hay usuarios registrados todavía.</div>');
       } else {
+        var list='';
         for(var j=0;j<users.length;j++){
           var u=users[j], t=totalsFromProg(u.prog);
           var acc=t.answered?Math.round(t.correct/t.answered*1000)/10:0;
           var dc=dotCls(u.last);
-
-          /* per-subject table rows */
           var subjRows='';
           for(var k=0;k<ALL_SUBJECTS.length;k++){
             var sk=ALL_SUBJECTS[k], ss=subjectStats(u.prog, sk);
             if(!ss) continue;
-            subjRows+=
-              '<tr>'
-              +'<td style="font-weight:600;">'+esc(sk)+'</td>'
-              +'<td>'+ss.sessions+'</td>'
-              +'<td>'+ss.answered+'</td>'
-              +'<td>'+ss.acc.toFixed(1)+'%</td>'
-              +'<td>'+ss.timeMin+' min</td>'
-              +'<td>'+ss.days+' días</td>'
-              +'<td>'+scorePill(ss.examBest)+'</td>'
-              +'<td>'+scorePill(ss.examAvg)+'</td>'
-              +'</tr>';
+            subjRows+='<tr><td style="font-weight:600;">'+esc(sk)+'</td><td>'+ss.sessions+'</td><td>'+ss.answered+'</td><td>'+ss.acc.toFixed(1)+'%</td><td>'+ss.timeMin+' min</td><td>'+ss.days+' días</td><td>'+scorePill(ss.examBest)+'</td><td>'+scorePill(ss.examAvg)+'</td></tr>';
           }
-
-          /* last 5 sessions history */
           var histRows='', allHist=[];
           for(var h=0;h<ALL_SUBJECTS.length;h++){
             var sh=ALL_SUBJECTS[h], subData=(u.prog||{})[sh];
             if(!subData||!subData.history) continue;
-            for(var hi=0;hi<subData.history.length;hi++){
-              allHist.push(Object.assign({},subData.history[hi],{subject:sh}));
-            }
+            for(var hi=0;hi<subData.history.length;hi++) allHist.push(Object.assign({},subData.history[hi],{subject:sh}));
           }
           allHist.sort(function(a,b){ return (b.finishedAt||'').localeCompare(a.finishedAt||''); });
           for(var hr=0;hr<Math.min(8,allHist.length);hr++){
             var he=allHist[hr];
             var modeLabel={'cuestionario':'Quiz','practicas':'Prácticas','examen':'Examen','examen1':'Examen 1','examenTotal':'Exam Total'}[he.mode]||he.mode||'?';
-            histRows+=
-              '<div class="hist-row">'
-              +'<span class="hist-mode">'+esc(modeLabel)+'</span>'
-              +'<span style="font-size:12px;font-weight:600;flex:1;">'+esc(he.subject||'')+'</span>'
-              +'<span style="font-size:11px;color:var(--muted);">'
-              +  he.correct+' ✓ '+he.wrong+' ✗ '+he.blank+' —'
-              +  (typeof he.score==='number'?' · '+scorePill(he.score):'')
-              +'</span>'
-              +'<span style="font-size:11px;color:var(--muted);margin-left:8px;">'+fullDate(he.finishedAt)+'</span>'
-              +'</div>';
+            histRows+='<div class="hist-row"><span class="hist-mode">'+esc(modeLabel)+'</span><span style="font-size:12px;font-weight:600;flex:1;">'+esc(he.subject||'')+'</span><span style="font-size:11px;color:var(--muted);">'+he.correct+' ✓ '+he.wrong+' ✗ '+he.blank+' —'+(typeof he.score==='number'?' · '+scorePill(he.score):'')+'</span><span style="font-size:11px;color:var(--muted);margin-left:8px;">'+fullDate(he.finishedAt)+'</span></div>';
           }
-
-          html+=
-            '<div class="auc" id="auc-'+j+'">'
-            /* header */
+          list+='<div class="auc" id="auc-'+j+'">'
             +'<div class="auc-header" onclick="var d=document.getElementById(\'aucdet-'+j+'\');d.classList.toggle(\'open\');this.querySelector(\'.auc-toggle\').textContent=d.classList.contains(\'open\')?\'▲ Ocultar\':\'▼ Detalles\'">'
-            +  '<div class="auc-avatar">'+esc(initials(u.name))+'</div>'
-            +  '<div class="auc-info">'
-            +    '<div class="auc-name"><span class="dot '+dc+'"></span>'+esc(u.name)+'</div>'
-            +    '<div class="auc-email">'+esc(u.email)+' · activo hace '+rel(u.last)+'</div>'
-            +  '</div>'
-            +  '<div class="auc-stats">'
-            +    '<span class="auc-stat">Sesiones <strong>'+t.sessions+'</strong></span>'
-            +    '<span class="auc-stat">Acierto <strong>'+acc.toFixed(1)+'%</strong></span>'
-            +    '<span class="auc-stat">'+esc(t.subjects.join(' · '))+'</span>'
-            +  '</div>'
-            +  '<button class="auc-toggle">▼ Detalles</button>'
-            +'</div>'
-            /* detail */
+            +'<div class="auc-avatar">'+esc(initials(u.name))+'</div>'
+            +'<div class="auc-info"><div class="auc-name"><span class="dot '+dc+'"></span>'+esc(u.name)+'</div><div class="auc-email">'+esc(u.email)+' · activo hace '+rel(u.last)+'</div></div>'
+            +'<div class="auc-stats"><span class="auc-stat">Sesiones <strong>'+t.sessions+'</strong></span><span class="auc-stat">Acierto <strong>'+acc.toFixed(1)+'%</strong></span><span class="auc-stat">Tiempo <strong>'+t.timeMin+' min</strong></span></div>'
+            +'<button class="auc-toggle">▼ Detalles</button></div>'
             +'<div class="auc-detail" id="aucdet-'+j+'">'
-            +  '<h5 style="margin:0 0 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">Estadísticas por asignatura</h5>'
-            +  (subjRows
-                ? '<div style="overflow-x:auto;"><table class="subj-table">'
-                +  '<thead><tr><th>Asignatura</th><th>Sesiones</th><th>Respondidas</th><th>Acierto</th><th>Tiempo</th><th>Días</th><th>Mejor nota</th><th>Media exam.</th></tr></thead>'
-                +  '<tbody>'+subjRows+'</tbody></table></div>'
-                : '<div class="admin-msg" style="padding:12px 0;">Sin actividad por asignatura todavía.</div>')
-            +  (histRows
-                ? '<div class="user-history"><h5>Últimas sesiones</h5>'+histRows+'</div>'
-                : '')
-            +'</div>'
-            +'</div>';
+            +(subjRows?'<div style="overflow-x:auto;"><table class="subj-table"><thead><tr><th>Asignatura</th><th>Sesiones</th><th>Respondidas</th><th>Acierto</th><th>Tiempo</th><th>Días</th><th>Mejor nota</th><th>Media exam.</th></tr></thead><tbody>'+subjRows+'</tbody></table></div>':'<div class="admin-empty" style="padding:16px;">Sin actividad por asignatura todavía.</div>')
+            +(histRows?'<div class="user-history"><h5>Últimas sesiones</h5>'+histRows+'</div>':'')
+            +'</div></div>';
         }
+        html+='<div class="admin-two-col">'
+          +adminSection('Usuarios registrados','Vista más visual con el mismo detalle de antes. Pulsa en cada tarjeta para abrir estadísticas y últimas sesiones.','<div class="admin-users-grid">'+list+'</div>')
+          +'<div class="admin-stack">'
+          +adminSection('Resumen rápido','Indicadores que ayudan a leer el estado general sin entrar en cada usuario.','<div class="admin-mini-list">'
+            +'<div class="admin-mini-item"><span>Usuarios visibles</span><strong>'+totalUsers+'</strong></div>'
+            +'<div class="admin-mini-item"><span>Sesiones acumuladas</span><strong>'+totalSessions+'</strong></div>'
+            +'<div class="admin-mini-item"><span>Respuestas totales</span><strong>'+totalAnswered+'</strong></div>'
+            +'<div class="admin-mini-item"><span>Asignaturas con datos</span><strong>'+ALL_SUBJECTS.length+'</strong></div>'
+          +'</div>')
+          +adminSection('Lectura del panel','El punto verde marca actividad reciente. El desplegable conserva las tablas por asignatura y el histórico de sesiones como en tu versión anterior.','<div class="admin-note"><b>Consejo:</b> usa esta pestaña para revisar quién estudia más, qué usuarios están activos y cómo evolucionan las notas de examen sin perder los detalles técnicos que ya tenías.</div>')
+          +'</div></div>';
       }
-
-      body.innerHTML=html;
+      body.innerHTML=html+'</div>';
     }catch(e){
       renderAdminError(e);
       try{ console.error('ADMIN_USERS_ERROR',e); }catch(_){}
@@ -1818,64 +1888,59 @@ init();
     try{
       if(!window.db) throw {code:'db-unavailable',message:'Firestore no inicializado.'};
       var data=await Promise.all([
-        window.db.collection('connections')
-          .orderBy('timestamp','desc')
-          .limit(100)
-          .get(),
+        window.db.collection('connections').orderBy('timestamp','desc').limit(100).get(),
         getQuotaUsageSummary()
       ]);
-      var snap=data[0];
-      var quota=data[1];
-
-      if(snap.empty){
-        body.innerHTML='<div class="admin-msg">Aún no hay conexiones registradas. Se registrarán a partir de ahora al iniciar sesión.</div>';
-        return;
-      }
-
-      /* group by day */
-      var byDay={};
-      var dayOrder=[];
+      var snap=data[0], quota=data[1];
+      var byDay={}, dayOrder=[], allEmails={}, totalVisible=0;
       snap.forEach(function(d){
-        var data=d.data()||{};
-        if((data.email||'')===ADMIN_EMAIL) return;
-        var ts=data.timestamp||'';
+        var item=d.data()||{};
+        if((item.email||'')===ADMIN_EMAIL) return;
+        totalVisible++;
+        var ts=item.timestamp||'';
         var day=ts?ts.slice(0,10):'sin-fecha';
         if(!byDay[day]){ byDay[day]=[]; dayOrder.push(day); }
-        byDay[day].push(data);
+        byDay[day].push(item);
+        if(item.email) allEmails[item.email]=1;
       });
-
-      /* total unique users */
-      var allEmails={};
-      snap.forEach(function(d){ var e=(d.data()||{}).email||''; if(e&&e!==ADMIN_EMAIL) allEmails[e]=1; });
-
-      sub.textContent=snap.size+' conexiones registradas · '+Object.keys(allEmails).length+' usuarios únicos';
-
-      var html=renderQuotaWidget(quota)
-        +'<div class="admin-summary">'
-        +'<div class="admin-box"><div class="abox-label">Conexiones totales</div><div class="abox-val">'+snap.size+'</div></div>'
-        +'<div class="admin-box"><div class="abox-label">Usuarios únicos</div><div class="abox-val">'+Object.keys(allEmails).length+'</div></div>'
+      sub.textContent=totalVisible+' conexiones registradas · '+Object.keys(allEmails).length+' usuarios únicos';
+      var html='<div class="admin-page">'+renderQuotaWidget(quota)
+        +'<div class="admin-kpi-grid">'
+        +kpiCard('Conexiones totales', String(totalVisible), 'Últimos 100 registros')
+        +kpiCard('Usuarios únicos', String(Object.keys(allEmails).length), 'Excluye tu cuenta admin')
+        +kpiCard('Días con actividad', String(dayOrder.length), 'Agrupado por fecha')
         +'</div>';
-
-      for(var di=0;di<dayOrder.length;di++){
-        var day=dayOrder[di];
-        var entries=byDay[day];
-        var dayLabel=day==='sin-fecha'?'Sin fecha':new Date(day+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-        html+='<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 4px;border-bottom:2px solid var(--line);">'+esc(dayLabel)+' <span style="font-weight:400;">('+entries.length+' conexiones)</span></div>';
-        html+='<div>';
-        for(var ei=0;ei<entries.length;ei++){
-          var e=entries[ei];
-          var t=e.timestamp?e.timestamp.slice(11,16):'';
-          html+=
-            '<div class="conn-row">'
-            +'<span class="conn-time">'+esc(t)+' · '+rel(e.timestamp)+'</span>'
-            +'<span class="conn-user">'+esc(e.displayName||e.email||'?')+'<br><span style="font-size:11px;color:var(--muted);font-weight:400;">'+esc(e.email||'')+'</span></span>'
-            +'<span class="conn-dev">'+esc(deviceShort(e.ua||''))+'</span>'
-            +'</div>';
+      if(!totalVisible){
+        html+=adminSection('Conexiones','Aún no hay conexiones registradas.','<div class="admin-empty">Se registrarán a partir de ahora al iniciar sesión con Google.</div>');
+      } else {
+        var list='';
+        for(var di=0;di<dayOrder.length;di++){
+          var day=dayOrder[di], entries=byDay[day];
+          list+=dayLabelEs(day,'('+entries.length+' conexiones)')+'<div class="admin-list">';
+          for(var ei=0;ei<entries.length;ei++){
+            var e=entries[ei], status='';
+            list+='<article class="admin-entry"><div class="admin-entry-top"><div><div class="admin-entry-name">'+esc(e.displayName||e.email||'?')+'</div><div class="admin-entry-sub">'+esc(e.email||'Sin email')+' · '+esc(rel(e.timestamp))+'</div></div>'+statePillHtml(e.timestamp&&((Date.now()-new Date(e.timestamp))<3600000)?'Reciente':'Histórico', e.timestamp&&((Date.now()-new Date(e.timestamp))<3600000)?'ok':'muted')+'</div>'
+              +'<div class="admin-detail-grid">'
+              +'<div class="admin-chip-box"><strong>Hora</strong>'+esc(e.timestamp?e.timestamp.slice(11,16):'--:--')+'</div>'
+              +'<div class="admin-chip-box"><strong>Fecha completa</strong>'+esc(fullDate(e.timestamp))+'</div>'
+              +'<div class="admin-chip-box"><strong>Dispositivo</strong>'+esc(deviceShort(e.ua||''))+'</div>'
+              +'</div>'
+              +'<div class="admin-context"><b>User agent:</b> '+esc(e.ua||'Sin dato')+'</div></article>';
+          }
+          list+='</div>';
         }
-        html+='</div>';
+        html+='<div class="admin-two-col">'
+          +adminSection('Historial de conexiones','Cronología más clara y legible, sin perder la fecha, el email ni el dispositivo.','<div class="admin-stack">'+list+'</div>')
+          +'<div class="admin-stack">'
+          +adminSection('Resumen rápido','Referencia visual para entender el tráfico sin leer cada fila.','<div class="admin-mini-list">'
+            +'<div class="admin-mini-item"><span>Conexiones visibles</span><strong>'+totalVisible+'</strong></div>'
+            +'<div class="admin-mini-item"><span>Usuarios únicos</span><strong>'+Object.keys(allEmails).length+'</strong></div>'
+            +'<div class="admin-mini-item"><span>Primer bloque</span><strong>'+(dayOrder[0]?esc(dayOrder[0].split('-').reverse().join('/')):'-')+'</strong></div>'
+          +'</div>')
+          +adminSection('Qué ves aquí','Esta pestaña sirve para comprobar qué cuentas entran con Google, cuándo lo hacen y desde qué dispositivo. La cuota de Firebase se mantiene visible arriba.','<div class="admin-note"><b>Nota:</b> tu propia cuenta admin no se incluye en esta lista para no contaminar los datos.</div>')
+          +'</div></div>';
       }
-
-      body.innerHTML=html;
+      body.innerHTML=html+'</div>';
     }catch(e){
       renderAdminError(e);
       try{ console.error('ADMIN_CONNECTIONS_ERROR',e); }catch(_){}
@@ -1891,69 +1956,69 @@ init();
     try{
       if(!window.db) throw {code:'db-unavailable',message:'Firestore no inicializado.'};
       var data=await Promise.all([
-        window.db.collection(GUEST_COLLECTION)
-          .orderBy('lastSeen','desc')
-          .limit(100)
-          .get(),
+        window.db.collection(GUEST_COLLECTION).orderBy('lastSeen','desc').limit(100).get(),
         getQuotaUsageSummary()
       ]);
-      var snap=data[0];
-      var quota=data[1];
-
-      if(snap.empty){
-        body.innerHTML='<div class="admin-msg">Aún no hay invitados registrados. Se crearán al entrar sin login.</div>';
-        return;
-      }
-
-      var byDay={}, dayOrder=[], visitors={}, activeNow=0, totalDuration=0;
+      var snap=data[0], quota=data[1];
+      var byDay={}, dayOrder=[], visitors={}, activeNow=0, totalDuration=0, visibleCount=0, convertedCount=0;
       snap.forEach(function(d){
-        var data=d.data()||{};
-        var ts=data.startedAt||data.lastSeen||'';
+        var item=d.data()||{};
+        if(item.convertedToAuth || item.authEmail){ convertedCount++; return; }
+        var ts=item.startedAt||item.lastSeen||'';
         var day=ts?ts.slice(0,10):'sin-fecha';
         if(!byDay[day]){ byDay[day]=[]; dayOrder.push(day); }
-        byDay[day].push(data);
-        if(data.visitorId) visitors[data.visitorId]=1;
-        if(guestIsActive(data.lastSeen||data.startedAt)) activeNow++;
-        totalDuration+=Number(data.durationMs||0);
+        byDay[day].push(item);
+        visibleCount++;
+        if(item.visitorId) visitors[item.visitorId]=1;
+        if(guestIsActive(item.lastSeen||item.startedAt)) activeNow++;
+        totalDuration+=Number(item.durationMs||0);
       });
-
-      sub.textContent=snap.size+' sesiones invitado · '+Object.keys(visitors).length+' invitados únicos';
-
-      var avgDuration=snap.size?durationText(totalDuration/snap.size):'0 min';
-      var html=renderQuotaWidget(quota)
-        +'<div class="admin-summary">'
-        +'<div class="admin-box"><div class="abox-label">Sesiones invitado</div><div class="abox-val">'+snap.size+'</div></div>'
-        +'<div class="admin-box"><div class="abox-label">Invitados únicos</div><div class="abox-val">'+Object.keys(visitors).length+'</div></div>'
-        +'<div class="admin-box"><div class="abox-label">Activos ahora</div><div class="abox-val">'+activeNow+'</div></div>'
-        +'<div class="admin-box"><div class="abox-label">Duración media</div><div class="abox-val" style="font-size:18px;">'+esc(avgDuration)+'</div></div>'
-        +'</div>';
-
+      if(!visibleCount){
+        body.innerHTML='<div class="admin-page">'+renderQuotaWidget(quota)+adminSection('Invitados','No hay invitados reales ahora mismo. Las sesiones convertidas a Gmail ya no se muestran aquí.','<div class="admin-empty">Sin invitados reales. Cuando alguien entre sin iniciar sesión, aparecerá aquí.</div>')+'</div>';
+        sub.textContent='Sin invitados reales';
+        return;
+      }
+      sub.textContent=visibleCount+' sesiones invitado · '+Object.keys(visitors).length+' invitados únicos';
+      var avgDuration=visibleCount?durationText(totalDuration/visibleCount):'0 min';
+      var list='';
       for(var di=0;di<dayOrder.length;di++){
-        var day=dayOrder[di];
-        var entries=byDay[day];
-        var dayLabel=day==='sin-fecha'?'Sin fecha':new Date(day+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-        html+='<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 4px;border-bottom:2px solid var(--line);">'+esc(dayLabel)+' <span style="font-weight:400;">('+entries.length+' sesiones)</span></div>';
-        html+='<div>';
+        var day=dayOrder[di], entries=byDay[day];
+        list+=dayLabelEs(day,'('+entries.length+' sesiones)')+'<div class="admin-list">';
         for(var ei=0;ei<entries.length;ei++){
           var e=entries[ei]||{};
           var started=e.startedAt||'';
           var active=guestIsActive(e.lastSeen||started);
-          var statePill=active
-            ? '<span class="score-pill sp-ok">Activo ahora</span>'
-            : '<span class="score-pill sp-muted">Inactivo</span>';
-          html+=
-            '<div class="conn-row" style="align-items:flex-start;">'
-            +'<span class="conn-time">'+esc(started?started.slice(11,16):'--:--')+' · '+rel(e.lastSeen||started)+'</span>'
-            +'<span class="conn-user">'+esc(e.displayName||guestNameFromId(e.visitorId||''))
-            +'<br><span style="font-size:11px;color:var(--muted);font-weight:400;">visitorId: '+esc(e.visitorId||'')+' · sessionId: '+esc(e.sessionId||'')+'</span>'
-            +'<br><span style="font-size:11px;color:var(--muted);font-weight:400;">Inicio: '+esc(fullDate(e.startedAt))+' · Última actividad: '+esc(fullDate(e.lastSeen))+' · Duración: '+esc(durationText(e.durationMs))+'</span></span>'
-            +'<span class="conn-dev" style="text-align:right;">'+statePill+'<br><span style="display:inline-block;margin-top:6px;">'+esc(deviceShort(e.ua||''))+'</span></span>'
-            +'</div>';
+          list+='<article class="admin-entry"><div class="admin-entry-top"><div><div class="admin-entry-name">'+esc(e.displayName||guestNameFromId(e.visitorId||''))+'</div><div class="admin-entry-sub">'+esc(e.visitorId||'Sin visitorId')+' · '+esc(rel(e.lastSeen||started))+'</div></div>'
+            +(active?statePillHtml('Activo ahora','ok'):statePillHtml('Inactivo','muted'))+'</div>'
+            +'<div class="admin-detail-grid">'
+            +'<div class="admin-chip-box"><strong>Inicio</strong>'+esc(fullDate(e.startedAt))+'</div>'
+            +'<div class="admin-chip-box"><strong>Última actividad</strong>'+esc(fullDate(e.lastSeen))+'</div>'
+            +'<div class="admin-chip-box"><strong>Duración</strong>'+esc(durationText(e.durationMs))+'</div>'
+            +'<div class="admin-chip-box"><strong>Dispositivo</strong>'+esc(deviceShort(e.ua||''))+'</div>'
+            +'</div>'
+            +'<div class="admin-context"><b>Session ID:</b> '+esc(e.sessionId||'')+'<br><b>Visitor ID:</b> '+esc(e.visitorId||'')+(e.lastPath?'<br><b>Ruta:</b> '+esc(e.lastPath):'')+'</div></article>';
         }
-        html+='</div>';
+        list+='</div>';
       }
-
-      body.innerHTML=html;
+      var html='<div class="admin-page">'+renderQuotaWidget(quota)
+        +'<div class="admin-kpi-grid">'
+        +kpiCard('Sesiones invitado', String(visibleCount), 'Sin usuarios con Gmail')
+        +kpiCard('Invitados únicos', String(Object.keys(visitors).length), 'Calculado por visitorId')
+        +kpiCard('Activos ahora', String(activeNow), 'Último ping reciente')
+        +kpiCard('Duración media', esc(avgDuration), 'Tiempo abierto estimado')
+        +'</div>'
+        +'<div class="admin-two-col">'
+        +adminSection('Actividad de invitados','Aquí solo aparecen invitados reales. Las sesiones que pasan a Gmail quedan fuera para evitar duplicados.','<div class="admin-stack">'+list+'</div>')
+        +'<div class="admin-stack">'
+        +adminSection('Resumen rápido','Bloque lateral para lectura rápida del estado actual.','<div class="admin-mini-list">'
+          +'<div class="admin-mini-item"><span>Invitados reales</span><strong>'+Object.keys(visitors).length+'</strong></div>'
+          +'<div class="admin-mini-item"><span>Sesiones visibles</span><strong>'+visibleCount+'</strong></div>'
+          +'<div class="admin-mini-item"><span>Convertidos a Gmail</span><strong>'+convertedCount+'</strong></div>'
+          +'<div class="admin-mini-item"><span>Días con actividad</span><strong>'+dayOrder.length+'</strong></div>'
+        +'</div>')
+        +adminSection('Qué mejora este diseño','Más claridad visual, misma información, y lectura más cómoda en móvil y escritorio.','<div class="admin-note"><b>Incluye:</b> inicio, última actividad, duración, device, visitorId, sessionId, estado actual y la barra de cuota Firebase sin perder detalle técnico.</div>')
+        +'</div></div>';
+      body.innerHTML=html+'</div>';
     }catch(e){
       renderAdminError(e);
       try{ console.error('ADMIN_GUESTS_ERROR',e); }catch(_){}
@@ -1985,7 +2050,8 @@ init();
           fab.style.display=isAdmin?'flex':'none';
           if(!isAdmin){ overlay.classList.remove('open'); }
           if(user){
-            stopGuestTracking();
+            markGuestSessionConverted(user);
+            stopGuestTracking(true);
             saveUserMeta(user);
           }else{
             startGuestTracking();
