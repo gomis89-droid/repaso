@@ -4,88 +4,434 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Repaso TSEI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4f7fb;--panel:#fff;--panel2:#eef4ff;--text:#122033;--muted:#637086;--line:#d7deea;--accent:#2563eb;--accent2:#1d4ed8;--ok:#15803d;--okbg:#dcfce7;--bad:#dc2626;--badbg:#fee2e2;--warn:#a16207;--warnbg:#fef3c7;--shadow:0 8px 24px rgba(18,32,51,.08);--radius:18px}
-body.dark, html.dark{--bg:#0b1220;--panel:#111a2b;--panel2:#16233b;--text:#edf3ff;--muted:#9fb0c9;--line:#24324d;--accent:#60a5fa;--accent2:#93c5fd;--ok:#4ade80;--okbg:rgba(34,197,94,.12);--bad:#f87171;--badbg:rgba(239,68,68,.12);--warn:#fbbf24;--warnbg:rgba(245,158,11,.12);--shadow:0 12px 28px rgba(0,0,0,.3)}
-*{box-sizing:border-box}html,body{margin:0;padding:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}
-.app{width:min(1100px,calc(100% - 24px));margin:0 auto;padding:14px 0 32px}
-.topbar{position:sticky;top:0;z-index:20;background:linear-gradient(to bottom,var(--bg) 86%,transparent);padding-top:6px;margin-bottom:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}.brand{min-width:0;flex:1 1 auto}.brand small{display:block;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}.brand h1{margin:0;font-size:clamp(22px,3vw,34px)}.toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center;flex:0 0 auto}.toolbar>#authControls{display:flex;gap:8px;align-items:center;min-width:0}
-.btn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:11px 16px;border-radius:999px;font-weight:700;box-shadow:var(--shadow)}.btn.primary{background:var(--accent);color:#fff;border-color:transparent}.btn.ghost{box-shadow:none}.btn.danger{background:var(--bad);border-color:transparent;color:#fff}.btn.small{padding:8px 12px;font-size:14px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.screen{display:none}.screen.active{display:block}.hero{padding:18px;margin-bottom:16px;background:linear-gradient(135deg,var(--panel),var(--panel2))}
-.subject-grid,.menu,.stats-grid,.mode-grid{display:grid;gap:14px}.subject-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.menu,.stats-grid,.mode-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-.subject-card,.mode-card,.stat-card{border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:18px;text-align:left}.subject-card.locked{opacity:.75}.subject-card h3,.mode-card h3{margin:10px 0 8px;color:var(--text)}.subject-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.subject-best-score{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--panel2);color:var(--accent);font-size:12px;font-weight:800;white-space:nowrap}.mode-card.purple{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-color:transparent}.mode-card.purple h3{color:#fff}.mode-card.purple .small,.mode-card.purple .badge.mode{color:#efe7ff;background:rgba(255,255,255,.14)}.small{font-size:14px;color:var(--muted);line-height:1.5}.badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}.badge.ok{background:var(--okbg);color:var(--ok)}.badge.soon{background:var(--warnbg);color:var(--warn)}.badge.mode{background:var(--panel2);color:var(--accent)}.mode-card-wrap{display:grid;gap:8px}.mode-info-row{display:flex;justify-content:flex-end}.mode-info-btn{width:28px;height:28px;border:none;border-radius:999px;background:#dc2626;color:#fff;font-weight:900;box-shadow:var(--shadow)}.mode-card-wrap .mode-card{width:100%;display:block}
-.info-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.info-box{display:none;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:16px}.info-box.active{display:block}.info-trigger{display:inline-flex;align-items:center;gap:10px}.alert-icon{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;background:#dc2626;color:#fff;font-size:15px;font-weight:900;box-shadow:var(--shadow)}
-.help-stack{display:grid;gap:14px}.help-card{padding:18px}.help-card h3{margin:0 0 8px}.help-card ul{margin:8px 0 0 18px;padding:0}.help-card li{margin:6px 0}.legend-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-.score-fail{color:#dc2626!important;background:rgba(239,68,68,.12);border-radius:12px;padding:2px 8px;display:inline-block}
-.score-pass-just{color:#a16207!important;background:rgba(245,158,11,.12);border-radius:12px;padding:2px 8px;display:inline-block}
-.score-pass-good{color:#15803d!important;background:rgba(34,197,94,.10);border-radius:12px;padding:2px 8px;display:inline-block}
-.quiz-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;align-items:start}.main-card,.side-card,.mistakes,.progress-card{padding:18px}.side-card{position:sticky;top:88px}.meta-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.progress{height:12px;border-radius:999px;overflow:hidden;background:var(--panel2);border:1px solid var(--line);margin-bottom:14px}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2))}.question{font-size:clamp(19px,2.5vw,28px);line-height:1.35;margin:12px 0 18px}.options{display:grid;gap:12px}.option{width:100%;text-align:left;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--panel);color:var(--text)}.option.correct{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:700}.option.wrong{background:var(--badbg);border-color:var(--bad);color:var(--bad);font-weight:700}.controls{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:18px}.statement{white-space:pre-wrap;line-height:1.6;font-size:14px}.results-wrap{display:grid;gap:16px}.score-card{padding:22px;text-align:center;background:linear-gradient(135deg,var(--panel),var(--panel2))}.score-number{font-size:clamp(40px,9vw,80px);font-weight:900;color:var(--accent)}.stat-card .n{font-size:34px;font-weight:900}.mistake{border-bottom:1px solid var(--line);padding:16px 0}.mistake:last-child{border-bottom:0}.review-option{padding:10px 12px;border-radius:12px;border:1px solid var(--line);margin-top:8px}.review-option.correct{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:700}.review-option.wrong{background:var(--badbg);border-color:var(--bad);color:var(--bad);font-weight:700}
-.progress-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:14px}.subject-switch{display:flex;gap:8px;flex-wrap:wrap}.subject-switch .btn.active{background:var(--accent);color:#fff;border-color:transparent}.history-item,.weak-item{padding:14px 0;border-bottom:1px solid var(--line)}.history-item:last-child,.weak-item:last-child{border-bottom:0}.share-box{display:grid;gap:10px}.checkbox-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.checkbox-card{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--panel2)}.empty{padding:14px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);background:var(--panel2)}
-textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--text)}.list-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.question-list-item{padding:16px 0;border-bottom:1px solid var(--line)}.question-list-item:last-child{border-bottom:0}.question-list-item ol{margin:10px 0 0 20px;padding:0}.question-list-item li{margin:6px 0}.question-list-item li.correct-answer{font-weight:700;color:var(--ok)}
-@media (max-width:860px){.quiz-layout{grid-template-columns:1fr}.side-card{position:static}}
-@media (max-width:700px){
-  .app{width:100%;padding:8px 10px 18px}
-  .topbar{gap:8px;align-items:center;padding-top:max(6px,env(safe-area-inset-top));margin-bottom:10px}
-  .brand small{display:none}
-  .brand h1{font-size:18px!important;justify-content:flex-start!important;text-align:left!important;gap:8px!important;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .brand h1 span:first-child{font-size:1.1em!important}
-  .toolbar{justify-content:flex-end;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
-  .toolbar .btn,.toolbar #authControls .btn{flex:0 0 auto}
-  #authControls{display:flex;flex:0 0 auto}
-  .hero,.main-card,.side-card,.mistakes,.progress-card,.score-card{padding:14px}
-  .controls{gap:8px}
-  .controls .btn{padding:10px 14px}
-  .question{font-size:clamp(16px,5.4vw,22px);margin:10px 0 14px}
-  .option{padding:12px;font-size:16px}
-  body.quiz-active .topbar{margin-bottom:8px}
-  body.quiz-active .brand h1{font-size:16px!important}
-  body.quiz-active .toolbar .btn,body.quiz-active .toolbar #authControls .btn{padding:8px 12px;font-size:13px}
-  body.quiz-active #screen-quiz.active .quiz-layout{grid-template-columns:1fr;gap:10px}
-  body.quiz-active #screen-quiz.active #casePanel{max-height:22dvh;overflow:auto}
+:root {
+  --bg: #f2f5fb;
+  --bg2: #e8edf8;
+  --panel: #ffffff;
+  --panel2: #f4f7ff;
+  --text: #0d1726;
+  --muted: #5a6a87;
+  --line: rgba(90,106,135,0.14);
+  --accent: #2563eb;
+  --accent2: #1d4ed8;
+  --accent-rgb: 37,99,235;
+  --accent-soft: rgba(37,99,235,0.1);
+  --ok: #059669;
+  --okbg: rgba(5,150,105,0.1);
+  --bad: #dc2626;
+  --badbg: rgba(220,38,38,0.1);
+  --warn: #d97706;
+  --warnbg: rgba(217,119,6,0.1);
+  --shadow: 0 4px 24px rgba(13,23,38,0.09);
+  --shadow-sm: 0 2px 8px rgba(13,23,38,0.06);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --t: 0.18s cubic-bezier(0.4,0,0.2,1);
 }
-@media (max-width:480px){
-  .topbar{gap:6px}
-  .brand{min-width:0}
-  .brand h1{font-size:15px!important}
-  .toolbar .btn,.toolbar #authControls .btn{padding:7px 11px;font-size:13px}
-  .subject-grid,.menu,.stats-grid,.mode-grid,.checkbox-grid{grid-template-columns:1fr}
+body.dark, html.dark {
+  --bg: #080d18;
+  --bg2: #0c1220;
+  --panel: #111827;
+  --panel2: #16203a;
+  --text: #dde4f5;
+  --muted: #6e83a8;
+  --line: rgba(110,131,168,0.11);
+  --accent: #60a5fa;
+  --accent2: #93c5fd;
+  --accent-rgb: 96,165,250;
+  --accent-soft: rgba(96,165,250,0.1);
+  --ok: #34d399;
+  --okbg: rgba(52,211,153,0.1);
+  --bad: #f87171;
+  --badbg: rgba(248,113,113,0.1);
+  --warn: #fbbf24;
+  --warnbg: rgba(251,191,36,0.1);
+  --shadow: 0 4px 32px rgba(0,0,0,0.45);
+  --shadow-sm: 0 2px 12px rgba(0,0,0,0.35);
 }
 
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;transition:all var(--t)}
+
+/* ── APP SHELL ── */
+.app{width:min(1080px,calc(100% - 32px));margin:0 auto;padding:16px 0 40px}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:30;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:10px 18px;margin:0 -18px 20px;
+  background:rgba(var(--bg,242,245,251),.88);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+  border-radius:0 0 16px 16px;
+}
+html.dark .topbar{background:rgba(8,13,24,.88)}
+.brand{min-width:0;flex:1 1 auto}
+.brand small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand h1{margin:0;font-family:"Outfit",sans-serif;font-size:clamp(18px,2.4vw,28px);font-weight:800;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f97316,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+.brand h1 .brand-emoji{-webkit-text-fill-color:initial;font-size:1.15em;flex-shrink:0}
+.toolbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center;flex:0 0 auto}
+.toolbar>#authControls{display:flex;gap:6px;align-items:center}
+
+/* ── BUTTONS ── */
+.btn{
+  appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--text);
+  padding:9px 16px;border-radius:999px;font-weight:600;font-size:14px;
+  box-shadow:var(--shadow-sm);letter-spacing:.01em;
+  transition:all var(--t);
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.12);border-color:rgba(var(--accent-rgb),.3)}
+.btn:active{transform:translateY(0);box-shadow:var(--shadow-sm)}
+.btn.primary{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 3px 14px rgba(var(--accent-rgb),.35)}
+.btn.primary:hover{background:var(--accent2);box-shadow:0 5px 20px rgba(var(--accent-rgb),.45)}
+.btn.ghost{box-shadow:none;background:transparent;border-color:var(--line)}
+.btn.ghost:hover{background:var(--panel2);border-color:rgba(var(--accent-rgb),.25)}
+.btn.danger{background:var(--bad);border-color:transparent;color:#fff;box-shadow:0 3px 12px rgba(220,38,38,.3)}
+.btn.danger:hover{box-shadow:0 5px 18px rgba(220,38,38,.4)}
+.btn.small{padding:7px 13px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none !important;box-shadow:var(--shadow-sm) !important}
+
+/* ── PANEL / CARD ── */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+
+/* ── SCREEN TRANSITIONS ── */
+.screen{display:none;animation:fadeUp .22s cubic-bezier(.4,0,.2,1) both}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HERO CARD ── */
+.hero{
+  padding:28px 28px 24px;margin-bottom:20px;
+  background:linear-gradient(145deg, var(--panel) 0%, var(--panel2) 100%);
+  border:1px solid var(--line);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;top:-60px;right:-40px;
+  width:260px;height:260px;
+  background:radial-gradient(circle, rgba(var(--accent-rgb),.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero h2{
+  margin:0 0 18px;font-family:"Outfit",sans-serif;
+  font-size:clamp(22px,3.5vw,36px);font-weight:800;line-height:1.15;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* ── SUBJECT GRID ── */
+.subject-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));margin-top:4px}
+
+.subject-card{
+  border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);
+  padding:20px;text-align:left;cursor:pointer;position:relative;overflow:hidden;
+  transition:all var(--t);
+}
+.subject-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.12);border-color:rgba(var(--accent-rgb),.3)}
+.subject-card:active{transform:translateY(-1px)}
+.subject-card.locked{opacity:.6;cursor:not-allowed}
+.subject-card.locked:hover{transform:none;box-shadow:none}
+.subject-card h3{margin:10px 0 6px;font-family:"Outfit",sans-serif;font-weight:700;font-size:15px;color:var(--text);line-height:1.3}
+.subject-card .subject-icon{font-size:26px;display:block;margin-bottom:4px}
+
+/* subject card accent bar */
+.subject-card::after{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:var(--radius) var(--radius) 0 0;
+  transform:scaleX(0);transform-origin:left;
+  transition:transform var(--t);
+}
+.subject-card:hover::after{transform:scaleX(1)}
+
+.subject-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.subject-best-score{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:999px;
+  background:var(--accent-soft);color:var(--accent);
+  font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;
+}
+
+/* ── BADGE ── */
+.badge{
+  display:inline-block;padding:4px 11px;border-radius:999px;
+  font-size:12px;font-weight:700;letter-spacing:.02em;
+}
+.badge.ok{background:var(--okbg);color:var(--ok)}
+.badge.soon{background:var(--warnbg);color:var(--warn)}
+.badge.mode{background:var(--accent-soft);color:var(--accent)}
+
+/* ── MENU / MODE GRID ── */
+.menu,.stats-grid,.mode-grid{display:grid;gap:12px}
+.menu{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));margin-top:16px}
+.stats-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.mode-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+
+.mode-card{
+  border:1px solid var(--line);background:var(--panel);border-radius:var(--radius-sm);
+  padding:18px;text-align:left;cursor:pointer;
+  transition:all var(--t);
+}
+.mode-card:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,0,0,.1);border-color:rgba(var(--accent-rgb),.3)}
+.mode-card h3{margin:8px 0 6px;font-family:"Outfit",sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+.mode-card.purple{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border-color:transparent;box-shadow:0 4px 18px rgba(124,58,237,.3)}
+.mode-card.purple h3{color:#fff}
+.mode-card.purple:hover{box-shadow:0 8px 28px rgba(124,58,237,.45)}
+.mode-card.purple .small,.mode-card.purple .badge.mode{color:rgba(255,255,255,.75);background:rgba(255,255,255,.14)}
+
+.mode-card-wrap{display:grid;gap:6px}
+.mode-info-row{display:flex;justify-content:flex-end;margin-bottom:4px}
+.mode-info-btn{width:26px;height:26px;border:none;border-radius:999px;background:var(--bad);color:#fff;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(220,38,38,.3);transition:all var(--t)}
+.mode-info-btn:hover{transform:scale(1.1);box-shadow:0 3px 12px rgba(220,38,38,.4)}
+.mode-card-wrap .mode-card{width:100%;display:block}
+
+/* ── SMALL / MUTED TEXT ── */
+.small{font-size:13.5px;color:var(--muted);line-height:1.55}
+
+/* ── INFO ACTIONS ── */
+.info-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 8px}
+.info-box{display:none;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);padding:16px;margin-top:8px}
+.info-box.active{display:block}
+.info-trigger{display:inline-flex;align-items:center;gap:8px;font-size:13.5px}
+.alert-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:999px;
+  background:var(--bad);color:#fff;font-size:12px;font-weight:900;flex-shrink:0;
+}
+
+/* ── QUIZ LAYOUT ── */
+.quiz-layout{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;align-items:start}
+.main-card,.side-card,.mistakes,.progress-card{padding:22px}
+.side-card{position:sticky;top:72px;max-height:calc(100vh - 100px);overflow-y:auto}
+
+.meta-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+
+/* ── PROGRESS BAR ── */
+.progress{
+  height:6px;border-radius:999px;overflow:hidden;
+  background:var(--panel2);border:1px solid var(--line);margin-bottom:18px;
+}
+.progress>div{
+  height:100%;width:0;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  transition:width .4s cubic-bezier(.4,0,.2,1);
+  border-radius:999px;
+}
+
+/* ── QUESTION ── */
+.question{
+  font-size:clamp(16px,2.2vw,22px);line-height:1.45;
+  margin:4px 0 20px;font-family:"Outfit",sans-serif;font-weight:600;color:var(--text);
+}
+
+/* ── OPTIONS ── */
+.options{display:grid;gap:10px}
+.option{
+  width:100%;text-align:left;padding:14px 18px;
+  border-radius:var(--radius-sm);border:1.5px solid var(--line);
+  background:var(--panel);color:var(--text);
+  font-size:14.5px;font-weight:500;
+  transition:all var(--t);cursor:pointer;
+  position:relative;overflow:hidden;
+}
+.option:hover:not(.correct):not(.wrong){
+  border-color:rgba(var(--accent-rgb),.45);
+  background:var(--panel2);
+  transform:translateX(3px);
+}
+.option.correct{
+  background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:700;
+  box-shadow:0 0 0 1px var(--ok);
+}
+.option.wrong{
+  background:var(--badbg);border-color:var(--bad);color:var(--bad);font-weight:700;
+  box-shadow:0 0 0 1px var(--bad);
+}
+
+/* ── CONTROLS ── */
+.controls{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:20px}
+
+/* ── SECTION TAG ── */
+#sectionTag{
+  font-size:12px;color:var(--accent);font-weight:600;
+  background:var(--accent-soft);border-radius:6px;
+  display:inline-block;padding:3px 10px;margin-bottom:12px;
+}
+
+/* ── STATEMENT (casos prácticos) ── */
+.statement{white-space:pre-wrap;line-height:1.65;font-size:13.5px;color:var(--muted)}
+
+/* ── RESULTS ── */
+.results-wrap{display:grid;gap:14px}
+.score-card{
+  padding:28px 24px;text-align:center;
+  background:linear-gradient(145deg,var(--panel),var(--panel2));
+  position:relative;overflow:hidden;
+}
+.score-card::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 50% -20%, rgba(var(--accent-rgb),.08) 0%, transparent 65%);
+  pointer-events:none;
+}
+.score-number{
+  font-family:"Outfit",sans-serif;font-size:clamp(52px,11vw,88px);font-weight:900;
+  color:var(--accent);line-height:1;margin:8px 0 6px;
+  text-shadow:0 0 40px rgba(var(--accent-rgb),.25);
+}
+.stat-card{
+  border:1px solid var(--line);background:var(--panel);border-radius:var(--radius-sm);
+  padding:18px 20px;transition:all var(--t);
+}
+.stat-card:hover{border-color:rgba(var(--accent-rgb),.25);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.stat-card .n{font-family:"Outfit",sans-serif;font-size:32px;font-weight:800;color:var(--accent);margin-top:4px}
+.stat-card>div:first-child{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* ── MISTAKES / REVIEW ── */
+.mistake{border-bottom:1px solid var(--line);padding:18px 0}
+.mistake:last-child{border-bottom:0}
+.review-option{padding:10px 14px;border-radius:var(--radius-xs);border:1px solid var(--line);margin-top:8px;font-size:14px}
+.review-option.correct{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:700}
+.review-option.wrong{background:var(--badbg);border-color:var(--bad);color:var(--bad);font-weight:700}
+
+/* ── SCORE COLORS ── */
+.score-fail{color:var(--bad)!important;background:var(--badbg);border-radius:8px;padding:3px 10px;display:inline-block;font-weight:700}
+.score-pass-just{color:var(--warn)!important;background:var(--warnbg);border-radius:8px;padding:3px 10px;display:inline-block;font-weight:700}
+.score-pass-good{color:var(--ok)!important;background:var(--okbg);border-radius:8px;padding:3px 10px;display:inline-block;font-weight:700}
+
+/* ── PROGRESS SCREEN ── */
+.progress-card{padding:24px}
+.progress-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.progress-header h2{font-family:"Outfit",sans-serif;font-size:clamp(20px,3vw,28px);font-weight:800;margin:0 0 6px}
+
+/* ── SUBJECT SWITCH PILLS ── */
+.subject-switch{display:flex;gap:6px;flex-wrap:wrap}
+.subject-switch .btn.active{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(var(--accent-rgb),.35)}
+
+/* ── SHARE / CHECKBOX ── */
+.share-box{display:grid;gap:14px}
+.checkbox-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.checkbox-card{
+  border:1.5px solid var(--line);border-radius:var(--radius-xs);padding:11px 14px;
+  background:var(--panel2);cursor:pointer;transition:all var(--t);
+  display:flex;align-items:center;gap:8px;font-size:13.5px;
+}
+.checkbox-card:hover{border-color:rgba(var(--accent-rgb),.4);background:var(--panel)}
+.checkbox-card input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;flex-shrink:0}
+
+textarea.share-preview{
+  width:100%;min-height:160px;padding:14px;
+  border-radius:var(--radius-sm);border:1px solid var(--line);
+  background:var(--panel);color:var(--text);font-size:13px;
+  resize:vertical;font-family:"Plus Jakarta Sans",monospace;
+}
+textarea.share-preview:focus{outline:none;border-color:rgba(var(--accent-rgb),.5)}
+
+/* ── LIST VIEW ── */
+.list-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.question-list-item{padding:18px 0;border-bottom:1px solid var(--line)}
+.question-list-item:last-child{border-bottom:0}
+.question-list-item ol{margin:10px 0 0 20px;padding:0;font-size:13.5px}
+.question-list-item li{margin:5px 0;color:var(--muted)}
+.question-list-item li.correct-answer{font-weight:700;color:var(--ok)}
+
+/* ── HISTORY / WEAK ── */
+.history-item,.weak-item{padding:14px 0;border-bottom:1px solid var(--line)}
+.history-item:last-child,.weak-item:last-child{border-bottom:0}
+
+/* ── EMPTY STATE ── */
+.empty{
+  padding:20px;border:1.5px dashed var(--line);border-radius:var(--radius-sm);
+  color:var(--muted);background:var(--panel2);text-align:center;font-size:14px;
+}
+
+/* ── LEGEND ── */
+.legend-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* ── HELP CARDS ── */
+.help-stack{display:grid;gap:12px}
+.help-card{padding:20px}
+.help-card h3{margin:0 0 8px;font-family:"Outfit",sans-serif;font-weight:700;font-size:15px}
+.help-card ul{margin:8px 0 0 18px;padding:0}
+.help-card li{margin:5px 0;font-size:13.5px;color:var(--muted)}
+
+/* ── QUIZ TOP TITLE ── */
+#quizSubjectTitle{
+  font-size:13px;font-weight:700;color:var(--accent);
+  letter-spacing:.04em;text-transform:uppercase;
+  padding:8px 16px;background:var(--accent-soft);
+  border-radius:999px;display:inline-block;margin-bottom:14px;
+}
+
+/* ── CASE PANEL ── */
+.side-card .badge{margin-bottom:8px}
+.side-card h3{font-family:"Outfit",sans-serif;font-weight:700;margin:8px 0 12px;font-size:15px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .quiz-layout{grid-template-columns:1fr}
+  .side-card{position:static;max-height:none}
+}
+@media(max-width:700px){
+  .app{width:100%;padding:8px 14px 24px}
+  .topbar{margin:0 -14px 16px;padding:8px 14px;border-radius:0}
+  .brand small{display:none}
+  .brand h1{font-size:17px!important}
+  .toolbar{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+  .toolbar .btn,.toolbar #authControls .btn{flex:0 0 auto;padding:7px 12px;font-size:12px}
+  .hero{padding:20px 18px 18px}
+  .main-card,.side-card,.mistakes,.progress-card{padding:16px}
+  .question{font-size:clamp(15px,5vw,20px)}
+  .option{padding:12px 14px;font-size:14px}
+  .controls{gap:6px}
+  .controls .btn{padding:9px 13px;font-size:13px}
+  .subject-grid,.menu,.stats-grid,.mode-grid,.checkbox-grid{grid-template-columns:1fr}
+  body.quiz-active .topbar{margin-bottom:8px}
+  body.quiz-active .brand h1{font-size:15px!important}
+  body.quiz-active .toolbar .btn{padding:6px 10px;font-size:12px}
+  body.quiz-active #screen-quiz.active .quiz-layout{grid-template-columns:1fr;gap:10px}
+  body.quiz-active #screen-quiz.active #casePanel{max-height:20dvh;overflow:auto}
+}
+@media(max-width:480px){
+  .topbar{gap:6px}
+  .brand h1{font-size:15px!important}
+  .subject-grid,.menu,.stats-grid,.mode-grid,.checkbox-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="topbar">
-    <div class="brand"><small>Técnico Superior en Sistemas Electrotécnicos y Automatizados · 2º Curso</small><h1 style="
-  font-size:48px;
-  text-align:center;
-  margin:0;
-  font-weight:900;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:12px;
-  background:linear-gradient(135deg,#f97316,#ea580c);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-">
-  <span style="font-size:60px; -webkit-text-fill-color:initial;">💩</span>
-  <span>Mucha mierda ;)</span>
-</h1></div>
+    <div class="brand">
+      <small>Técnico Superior en Sistemas Electrotécnicos y Automatizados · 2º Curso</small>
+      <h1>
+        <span class="brand-emoji">💩</span>
+        <span>Mucha mierda ;)</span>
+      </h1>
+    </div>
     <div class="toolbar">
       <button class="btn ghost small" id="homeTopBtn" style="display:none;">Inicio</button>
       <button class="btn ghost small" id="progressBtn">Registro</button>
       <button class="btn ghost small" id="shareRegistryTopBtn" style="display:none;">Compartir</button>
-      <button class="btn ghost small" id="themeBtn">Cambiar tema</button>
+      <button class="btn ghost small" id="themeBtn">Tema</button>
     </div>
   </div>
 
   <section id="screen-home" class="screen active">
     <div class="hero panel">
-      <h2 style="margin:6px 0 22px;padding-bottom:10px;font-size:clamp(30px,4vw,42px);font-weight:900;line-height:1.18;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Elige una asignatura</h2>
-      <div class="info-actions" style="margin-top:6px;">
-        <button class="btn info-trigger" id="appHelpBtn" type="button"><span class="alert-icon">!</span><span>Cómo funciona la app</span></button>
+      <h2>Elige una asignatura</h2>
+      <div class="info-actions">
+        <button class="btn info-trigger ghost small" id="appHelpBtn" type="button">
+          <span class="alert-icon">?</span>
+          <span>Cómo funciona la app</span>
+        </button>
       </div>
       <div class="subject-grid" id="subjectGrid"></div>
     </div>
@@ -95,14 +441,13 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
     <div class="panel progress-card">
       <div class="progress-header">
         <div>
-          <h2 style="margin:0 0 8px;">Cómo funciona la app</h2>
-          <div class="small">Aquí tienes reunida toda la información importante sobre el uso de la aplicación, la puntuación y el registro.</div>
+          <h2 style="margin:0 0 6px;">Cómo funciona la app</h2>
+          <div class="small">Toda la información sobre uso, puntuación y registro.</div>
         </div>
         <div class="controls" style="margin-top:0;">
-          <button class="btn primary" id="helpBackBtn">Volver al inicio</button>
+          <button class="btn primary" id="helpBackBtn">← Volver al inicio</button>
         </div>
       </div>
-
       <div class="help-stack">
         <div class="panel help-card">
           <div class="badge mode">Uso general</div>
@@ -112,7 +457,6 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
             Dentro de cada asignatura puedes estudiar en distintos modos, como Cuestionario, Test de prácticas, Examen y, cuando exista, Examen 1.
           </div>
         </div>
-
         <div class="panel help-card">
           <div class="badge mode">Puntuación</div>
           <h3>Cómo se calcula la nota del examen</h3>
@@ -123,7 +467,6 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
             • Exámenes de 10 preguntas: las incorrectas restan 1/6.
           </div>
         </div>
-
         <div class="panel help-card">
           <div class="badge mode">Aprobado</div>
           <h3>Cómo saber si apruebas</h3>
@@ -139,29 +482,26 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
             <span class="score-pass-good">Verde: 6 o más</span>
           </div>
         </div>
-
         <div class="panel help-card">
           <div class="badge mode">Registro</div>
           <h3>Cómo funciona el registro</h3>
           <div class="small">
-            La app guarda por separado el progreso de cada asignatura. En el registro se muestran, entre otros datos, las sesiones realizadas, el porcentaje de aciertos y errores, el tiempo estudiado, los días de estudio, la mejor nota de examen, la nota media y la última nota.
+            La app guarda por separado el progreso de cada asignatura. En el registro se muestran las sesiones realizadas, el porcentaje de aciertos y errores, el tiempo estudiado, los días de estudio, la mejor nota de examen, la nota media y la última nota.
           </div>
         </div>
-
         <div class="panel help-card">
           <div class="badge mode">Guardado</div>
           <h3>Dónde se guarda el progreso</h3>
           <div class="small">
-            • Si entras sin iniciar sesión, el progreso se guarda solo en este navegador y en este dispositivo.<br>
-            • Si inicias sesión con tu cuenta, podrás conservar tu progreso y recuperarlo en otros dispositivos.
+            • Sin sesión iniciada: el progreso se guarda solo en este navegador y dispositivo.<br>
+            • Con sesión iniciada: puedes recuperar tu progreso en otros dispositivos.
           </div>
         </div>
-
         <div class="panel help-card">
           <div class="badge mode">Consejo</div>
           <h3>Recomendación de uso</h3>
           <div class="small">
-            Una buena forma de estudiar con la app es empezar por Cuestionario, seguir con Test de prácticas, hacer simulacros de Examen y revisar después el Registro y las preguntas más falladas.
+            Una buena forma de estudiar es empezar por Cuestionario, seguir con Test de prácticas, hacer simulacros de Examen y revisar después el Registro y las preguntas más falladas.
           </div>
         </div>
       </div>
@@ -170,16 +510,16 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
 
   <section id="screen-menu" class="screen">
     <div class="hero panel">
-      <div id="menuSubjectTitle" class="small" style="font-weight:700;margin-bottom:8px;"></div>
-      <h2 style="margin:0 0 8px;">Selecciona el modo</h2>
-      <div class="small">Las preguntas y los casos se mezclan aleatoriamente en cada sesión nueva.</div>
+      <div id="menuSubjectTitle" class="small" style="font-weight:700;margin-bottom:6px;"></div>
+      <h2>Selecciona el modo</h2>
+      <div class="small" style="margin-top:-10px;margin-bottom:4px;">Las preguntas y los casos se mezclan aleatoriamente en cada sesión nueva.</div>
       <div class="menu" id="modeMenu"></div>
-      <div class="controls" style="justify-content:flex-start;margin-top:16px;">
-        <button class="btn danger" id="resetSubjectProgressBtn" type="button">Resetear registro de esta asignatura</button>
+      <div class="controls" style="justify-content:flex-start;margin-top:18px;">
+        <button class="btn danger small" id="resetSubjectProgressBtn" type="button">Resetear registro de esta asignatura</button>
       </div>
-      <div class="panel" id="practicePickerPanel" style="display:none;padding:16px;margin-top:16px;">
+      <div class="panel" id="practicePickerPanel" style="display:none;padding:18px;margin-top:16px;">
         <div class="badge mode">Test de prácticas</div>
-        <h3 style="margin:10px 0 8px;">Elige cómo quieres practicar</h3>
+        <h3 style="margin:10px 0 6px;font-family:'Outfit',sans-serif;font-weight:700;">Elige cómo quieres practicar</h3>
         <div class="small" style="margin-bottom:12px;">Puedes escoger un caso práctico concreto o dejar que la aplicación seleccione uno aleatorio.</div>
         <div class="controls" style="justify-content:flex-start;margin-top:0;">
           <button class="btn primary" id="practiceRandomBtn" type="button">Caso aleatorio</button>
@@ -195,18 +535,23 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
     <div class="quiz-layout">
       <div class="panel main-card">
         <div class="meta-row">
-          <div><div class="badge mode" id="modeBadge"></div><div class="small" id="blockInfo" style="margin-top:8px;"></div></div>
+          <div>
+            <div class="badge mode" id="modeBadge"></div>
+            <div class="small" id="blockInfo" style="margin-top:6px;"></div>
+          </div>
           <div class="small" id="counterInfo"></div>
         </div>
         <div class="progress"><div id="progressBar"></div></div>
-        <div class="controls" style="margin-top:0;margin-bottom:10px;justify-content:flex-end;"><button class="btn ghost small" id="toggleInfoBtn">Info</button></div>
-        <div class="small" id="sectionTag" style="display:none;margin-bottom:8px;"></div>
+        <div class="controls" style="margin-top:-6px;margin-bottom:12px;justify-content:flex-end;">
+          <button class="btn ghost small" id="toggleInfoBtn">Info</button>
+        </div>
+        <div class="small" id="sectionTag" style="display:none;margin-bottom:10px;"></div>
         <div class="question" id="questionText"></div>
         <div class="options" id="optionsWrap"></div>
         <div class="controls">
-          <button class="btn ghost" id="shareQuestionBtn">Reportar error</button>
+          <button class="btn ghost small" id="shareQuestionBtn">Reportar error</button>
           <button class="btn danger" id="exitBtn">Salir</button>
-          <button class="btn primary" id="nextBtn" disabled>Siguiente</button>
+          <button class="btn primary" id="nextBtn" disabled>Siguiente →</button>
         </div>
       </div>
       <div class="panel side-card" id="casePanel" style="display:none;">
@@ -225,38 +570,39 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
         <div class="small" id="scoreFormulaText"></div>
       </div>
       <div class="stats-grid">
-        <div class="stat-card"><div>Aciertos</div><div class="n" id="statCorrect">0</div></div>
-        <div class="stat-card"><div>Errores</div><div class="n" id="statWrong">0</div></div>
+        <div class="stat-card"><div>Aciertos ✓</div><div class="n" id="statCorrect">0</div></div>
+        <div class="stat-card"><div>Errores ✗</div><div class="n" id="statWrong">0</div></div>
         <div class="stat-card"><div>Sin contestar</div><div class="n" id="statBlank">0</div></div>
       </div>
       <div class="panel mistakes">
-        <h3 id="resultsTitle" style="margin-top:0;">Resultados</h3>
-        <div class="controls" style="justify-content:flex-start;margin-bottom:10px;">
-          <button class="btn ghost" id="shareActivityBtn">Compartir actividad</button>
+        <h3 id="resultsTitle" style="margin-top:0;font-family:'Outfit',sans-serif;font-weight:800;">Resultados</h3>
+        <div class="controls" style="justify-content:flex-start;margin-bottom:12px;">
+          <button class="btn ghost small" id="shareActivityBtn">Compartir actividad</button>
         </div>
         <div id="mistakesWrap"></div>
         <div class="controls">
-          <button class="btn" id="repeatBtn">Repetir</button>
-          <button class="btn" id="subjectBtn">Volver a la asignatura</button>
-          <button class="btn primary" id="homeBtn">Volver al inicio</button>
+          <button class="btn ghost" id="repeatBtn">Repetir</button>
+          <button class="btn" id="subjectBtn">Volver a asignatura</button>
+          <button class="btn primary" id="homeBtn">Inicio</button>
         </div>
-        <div class="small" style="margin-top:12px;">Banco cargado: <strong id="bankCount"></strong> preguntas de cuestionario y <strong id="caseCount"></strong> casos prácticos.</div>
+        <div class="small" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);">
+          Banco cargado: <strong id="bankCount"></strong> preguntas de cuestionario · <strong id="caseCount"></strong> casos prácticos.
+        </div>
       </div>
     </div>
   </section>
-
 
   <section id="screen-list" class="screen">
     <div class="panel progress-card">
       <div class="progress-header">
         <div>
-          <div id="listSubjectTitle" class="small" style="font-weight:700;margin-bottom:8px;"></div>
-          <h2 style="margin:0 0 8px;">Lista de preguntas</h2>
-          <div class="small">Consulta todas las preguntas del contenedor seleccionado sin cambiar el funcionamiento del test.</div>
+          <div id="listSubjectTitle" class="small" style="font-weight:700;margin-bottom:6px;"></div>
+          <h2 style="margin:0 0 6px;font-family:'Outfit',sans-serif;font-weight:800;">Lista de preguntas</h2>
+          <div class="small">Consulta todas las preguntas sin cambiar el funcionamiento del test.</div>
         </div>
         <div class="controls" style="margin-top:0;">
-          <button class="btn" id="listBackBtn">Volver a la asignatura</button>
-          <button class="btn primary" id="listHomeBtn">Inicio</button>
+          <button class="btn ghost small" id="listBackBtn">← Asignatura</button>
+          <button class="btn primary small" id="listHomeBtn">Inicio</button>
         </div>
       </div>
       <div class="list-toolbar">
@@ -264,8 +610,8 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
         <button class="btn small" id="listPracticeBtn">Test de prácticas</button>
         <button class="btn small" id="listExam1Btn" style="display:none;">Examen 1</button>
       </div>
-      <div class="small" id="listCountInfo" style="margin-bottom:12px;"></div>
-      <div class="panel" style="padding:16px;">
+      <div class="small" id="listCountInfo" style="margin-bottom:14px;"></div>
+      <div class="panel" style="padding:18px;">
         <div id="questionListWrap"></div>
       </div>
     </div>
@@ -275,17 +621,17 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
     <div class="panel progress-card">
       <div class="progress-header">
         <div>
-          <div id="weakSubjectTitle" class="small" style="font-weight:700;margin-bottom:8px;"></div>
-          <h2 style="margin:0 0 8px;">Preguntas más falladas</h2>
-          <div class="small">Aquí verás las preguntas que más errores acumulas en la asignatura seleccionada. Esta lista se actualiza automáticamente con cada sesión.</div>
+          <div id="weakSubjectTitle" class="small" style="font-weight:700;margin-bottom:6px;"></div>
+          <h2 style="margin:0 0 6px;font-family:'Outfit',sans-serif;font-weight:800;">Preguntas más falladas</h2>
+          <div class="small">Aquí verás las preguntas que más errores acumulas. Se actualiza automáticamente.</div>
         </div>
         <div class="controls" style="margin-top:0;">
-          <button class="btn" id="weakBackBtn">Volver a la asignatura</button>
-          <button class="btn primary" id="weakHomeBtn">Inicio</button>
+          <button class="btn ghost small" id="weakBackBtn">← Asignatura</button>
+          <button class="btn primary small" id="weakHomeBtn">Inicio</button>
         </div>
       </div>
-      <div class="small" id="weakCountInfo" style="margin-bottom:12px;"></div>
-      <div class="panel" style="padding:16px;">
+      <div class="small" id="weakCountInfo" style="margin-bottom:14px;"></div>
+      <div class="panel" style="padding:18px;">
         <div id="weakQuestionsList"></div>
       </div>
     </div>
@@ -295,45 +641,44 @@ textarea.share-preview{width:100%;min-height:170px;padding:12px;border-radius:14
     <div class="panel progress-card">
       <div class="progress-header">
         <div>
-          <h2 style="margin:0 0 8px;">Registro de progreso</h2>
+          <h2 style="margin:0 0 6px;font-family:'Outfit',sans-serif;font-weight:800;">Registro de progreso</h2>
           <div class="small" id="progressSubjectTitle"></div>
         </div>
         <div class="subject-switch" id="progressSubjectSwitch"></div>
       </div>
-      <div class="small" id="progressLastPlayed" style="margin-bottom:14px;"></div>
+      <div class="small" id="progressLastPlayed" style="margin-bottom:18px;padding:10px 14px;background:var(--panel2);border-radius:var(--radius-xs);border:1px solid var(--line);"></div>
       <div class="stats-grid">
         <div class="stat-card"><div>Sesiones</div><div class="n" id="overallSessions">0</div></div>
         <div class="stat-card"><div>% acierto</div><div class="n" id="overallAccuracy">0%</div></div>
         <div class="stat-card"><div>% fallo</div><div class="n" id="overallFailure">0%</div></div>
         <div class="stat-card"><div>Preguntas</div><div class="n" id="overallAnswered">0</div></div>
         <div class="stat-card"><div>Tiempo</div><div class="n" id="overallTime">0 min</div></div>
-        <div class="stat-card"><div>Días de estudio</div><div class="n" id="overallDays">0</div></div>
-        <div class="stat-card"><div>Mejor nota examen</div><div class="n" id="examBest">-</div></div>
-        <div class="stat-card"><div>Nota media examen</div><div class="n" id="examAvg">-</div></div>
-        <div class="stat-card"><div>Última nota examen</div><div class="n" id="examLast">-</div></div>
+        <div class="stat-card"><div>Días estudio</div><div class="n" id="overallDays">0</div></div>
+        <div class="stat-card"><div>Mejor nota</div><div class="n" id="examBest">-</div></div>
+        <div class="stat-card"><div>Nota media</div><div class="n" id="examAvg">-</div></div>
+        <div class="stat-card"><div>Última nota</div><div class="n" id="examLast">-</div></div>
       </div>
-      <h3>Por secciones</h3>
+      <h3 style="font-family:'Outfit',sans-serif;font-weight:700;margin:22px 0 12px;font-size:16px;">Por secciones</h3>
       <div class="mode-grid" id="modeProgressGrid"></div>
-      <div class="panel" style="padding:16px;margin-top:16px;">
-        <h3 style="margin-top:0;">Compartir métricas</h3>
+      <div class="panel" style="padding:20px;margin-top:18px;">
+        <h3 style="margin-top:0;font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;">Compartir métricas</h3>
         <div class="share-box">
           <div>
-            <label class="small">Asignatura</label>
+            <label class="small" style="font-weight:600;">Asignatura</label>
             <div id="shareSubjectOptions" class="subject-switch" style="margin-top:8px;"></div>
           </div>
           <div>
-            <div class="small" style="margin-bottom:8px;">Métricas a compartir</div>
+            <div class="small" style="font-weight:600;margin-bottom:8px;">Métricas a compartir</div>
             <div class="checkbox-grid" id="shareMetricOptions"></div>
           </div>
           <div class="controls" style="justify-content:flex-start;">
-            <button class="btn" id="selectAllMetricsBtn">Seleccionar todo</button>
-            <button class="btn" id="shareMetricsNowBtn">Compartir métricas</button>
-            <button class="btn" id="downloadTxtBtn">Descargar TXT</button>
+            <button class="btn ghost small" id="selectAllMetricsBtn">Seleccionar todo</button>
+            <button class="btn primary small" id="shareMetricsNowBtn">Compartir métricas</button>
+            <button class="btn ghost small" id="downloadTxtBtn">Descargar TXT</button>
           </div>
-          <textarea class="share-preview" id="sharePreviewBox" readonly></textarea>
+          <textarea class="share-preview" id="sharePreviewBox" readonly placeholder="Aquí aparecerá la vista previa..."></textarea>
         </div>
       </div>
-
     </div>
   </section>
 </div>
