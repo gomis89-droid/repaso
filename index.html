@@ -1179,6 +1179,14 @@ init();
   var ADMIN_EMAIL = 'gomis89@gmail.com';
   var ADMIN_CODE  = '5291';
   var ALL_SUBJECTS = ['PIICT','TPIDA','TPIE','Optativo','Sostenibilidad','IPE II','Inglés'];
+  var GUEST_COLLECTION = 'guestConnections';
+  var QUOTA_COLLECTION = 'quotaUsage';
+  var FIREBASE_DAILY_WRITE_LIMIT = 20000;
+  var GUEST_VISITOR_KEY = 'tsei_guest_visitor_id';
+  var GUEST_SESSION_KEY = 'tsei_guest_session_id';
+  var GUEST_STARTED_KEY = 'tsei_guest_started_at';
+  var guestTracker = {active:false, interval:null, visitorId:'', sessionId:'', startedAt:'', listenersBound:false};
+  var quotaTracker = {pending:0, timer:null, flushing:false, listenersBound:false};
 
   /* ── guardar meta de usuario y registrar conexión ── */
   function saveUserMeta(user){
@@ -1200,7 +1208,230 @@ init();
         timestamp: now,
         ua: navigator.userAgent||''
       });
+      noteEstimatedWrites(2);
     }catch(e){}
+  }
+
+  function safeStore(kind){
+    try{ return kind==='session' ? window.sessionStorage : window.localStorage; }catch(e){ return null; }
+  }
+  function makeId(prefix){
+    return (prefix||'id')+'_'+Math.random().toString(36).slice(2,10)+'_'+Date.now().toString(36);
+  }
+  function guestNameFromId(id){
+    var clean=String(id||'').replace(/[^a-z0-9]/gi,'').toUpperCase();
+    return 'Invitado '+(clean.slice(-6)||'LOCAL');
+  }
+  function getGuestVisitorId(){
+    var store=safeStore('local');
+    if(!store) return guestTracker.visitorId || makeId('guest');
+    var id=store.getItem(GUEST_VISITOR_KEY);
+    if(!id){ id=makeId('guest'); store.setItem(GUEST_VISITOR_KEY,id); }
+    return id;
+  }
+  function getGuestSessionMeta(){
+    var store=safeStore('session');
+    var now=new Date().toISOString();
+    if(!store){
+      return {sessionId:guestTracker.sessionId||makeId('sess'), startedAt:guestTracker.startedAt||now};
+    }
+    var sessionId=store.getItem(GUEST_SESSION_KEY);
+    var startedAt=store.getItem(GUEST_STARTED_KEY);
+    if(!sessionId){ sessionId=makeId('sess'); store.setItem(GUEST_SESSION_KEY,sessionId); }
+    if(!startedAt){ startedAt=now; store.setItem(GUEST_STARTED_KEY,startedAt); }
+    return {sessionId:sessionId, startedAt:startedAt};
+  }
+  function guestDurationMs(startedAt){
+    var base=startedAt?new Date(startedAt).getTime():Date.now();
+    var diff=Date.now()-base;
+    return diff>0?diff:0;
+  }
+
+  function getPacificDateParts(date){
+    try{
+      var parts=new Intl.DateTimeFormat('en-CA',{
+        timeZone:'America/Los_Angeles',
+        year:'numeric',month:'2-digit',day:'2-digit',
+        hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+      }).formatToParts(date||new Date());
+      var out={};
+      parts.forEach(function(part){ if(part.type!=='literal') out[part.type]=part.value; });
+      return out;
+    }catch(e){
+      var d=date||new Date();
+      return {
+        year:String(d.getUTCFullYear()),
+        month:String(d.getUTCMonth()+1).padStart(2,'0'),
+        day:String(d.getUTCDate()).padStart(2,'0'),
+        hour:String(d.getUTCHours()).padStart(2,'0'),
+        minute:String(d.getUTCMinutes()).padStart(2,'0'),
+        second:String(d.getUTCSeconds()).padStart(2,'0')
+      };
+    }
+  }
+  function getQuotaWindowInfo(){
+    var now=new Date();
+    var parts=getPacificDateParts(now);
+    var dayKey=[parts.year,parts.month,parts.day].join('-');
+    var probe=new Date(now.getTime());
+    probe.setSeconds(0,0);
+    var limit=24*60+5;
+    for(var i=0;i<limit;i++){
+      probe=new Date(probe.getTime()+60000);
+      var nextParts=getPacificDateParts(probe);
+      var nextKey=[nextParts.year,nextParts.month,nextParts.day].join('-');
+      if(nextKey!==dayKey){
+        return {dayKey:dayKey, resetAt:probe};
+      }
+    }
+    return {dayKey:dayKey, resetAt:new Date(now.getTime()+24*60*60000)};
+  }
+  function quotaResetLabel(resetAt){
+    if(!resetAt) return '--';
+    try{
+      return resetAt.toLocaleString('es-ES',{
+        day:'2-digit',month:'2-digit',year:'numeric',
+        hour:'2-digit',minute:'2-digit'
+      });
+    }catch(e){ return String(resetAt); }
+  }
+  function bindQuotaListeners(){
+    if(quotaTracker.listenersBound) return;
+    quotaTracker.listenersBound=true;
+    window.addEventListener('visibilitychange',function(){
+      if(document.visibilityState==='hidden') flushEstimatedWrites();
+    });
+    window.addEventListener('pagehide',function(){ flushEstimatedWrites(); });
+    window.addEventListener('beforeunload',function(){ flushEstimatedWrites(); });
+  }
+  function noteEstimatedWrites(count){
+    count=Number(count||0);
+    if(!count || count<0) return;
+    bindQuotaListeners();
+    quotaTracker.pending+=count;
+    if(quotaTracker.timer) return;
+    quotaTracker.timer=setTimeout(function(){
+      quotaTracker.timer=null;
+      flushEstimatedWrites();
+    },45000);
+  }
+  function flushEstimatedWrites(){
+    if(quotaTracker.flushing || !quotaTracker.pending || !window.db || !(window.firebase && window.firebase.firestore)) return;
+    var count=quotaTracker.pending;
+    quotaTracker.pending=0;
+    quotaTracker.flushing=true;
+    var quotaInfo=getQuotaWindowInfo();
+    var FieldValue=window.firebase.firestore.FieldValue;
+    window.db.collection(QUOTA_COLLECTION).doc(quotaInfo.dayKey).set({
+      dayKey: quotaInfo.dayKey,
+      estimatedWrites: FieldValue.increment(count),
+      updatedAt: new Date().toISOString(),
+      resetAt: quotaInfo.resetAt.toISOString(),
+      limit: FIREBASE_DAILY_WRITE_LIMIT
+    },{merge:true}).catch(function(){
+      quotaTracker.pending+=count;
+    }).finally(function(){
+      quotaTracker.flushing=false;
+      if(quotaTracker.pending && !quotaTracker.timer){
+        quotaTracker.timer=setTimeout(function(){
+          quotaTracker.timer=null;
+          flushEstimatedWrites();
+        },30000);
+      }
+    });
+  }
+  async function getQuotaUsageSummary(){
+    var quotaInfo=getQuotaWindowInfo();
+    var used=0;
+    if(window.db){
+      try{
+        flushEstimatedWrites();
+        var doc=await window.db.collection(QUOTA_COLLECTION).doc(quotaInfo.dayKey).get();
+        if(doc.exists){
+          used=Number((doc.data()||{}).estimatedWrites||0);
+        }
+      }catch(e){}
+    }
+    used+=Number(quotaTracker.pending||0);
+    if(used<0) used=0;
+    var remaining=Math.max(0,FIREBASE_DAILY_WRITE_LIMIT-used);
+    var percent=Math.max(0,Math.min(100,(used/FIREBASE_DAILY_WRITE_LIMIT)*100));
+    return {
+      used: used,
+      remaining: remaining,
+      limit: FIREBASE_DAILY_WRITE_LIMIT,
+      percent: percent,
+      dayKey: quotaInfo.dayKey,
+      resetAt: quotaInfo.resetAt,
+      resetLabel: quotaResetLabel(quotaInfo.resetAt)
+    };
+  }
+  function renderQuotaWidget(quota){
+    quota=quota||{used:0,remaining:FIREBASE_DAILY_WRITE_LIMIT,limit:FIREBASE_DAILY_WRITE_LIMIT,percent:0,resetLabel:'--'};
+    var alertHtml='';
+    if(quota.percent>=100){
+      alertHtml='<div class="quota-alert danger">⚠️ Límite diario estimado completado. La barra se reiniciará cuando cambie el día de Firebase. Reinicio previsto: <strong>'+esc(quota.resetLabel)+'</strong>.</div>';
+    }else if(quota.percent>=80){
+      alertHtml='<div class="quota-alert warn">⚠️ Uso alto de escrituras. Quedan <strong>'+esc(String(quota.remaining))+'</strong> de '+esc(String(quota.limit))+' antes del reinicio previsto a las <strong>'+esc(quota.resetLabel)+'</strong>.</div>';
+    }
+    return ''
+      +'<div class="quota-card">'
+      +  '<div class="quota-head"><div><div class="abox-label">Escrituras estimadas de Firebase hoy</div><div class="small">Contador estimado de la app. Se reinicia cuando cambia el día de Firebase.</div></div><div class="quota-percent">'+esc(quota.percent.toFixed(1))+'%</div></div>'
+      +  '<div class="quota-bar"><div class="quota-bar-fill" style="width:'+esc(quota.percent.toFixed(2))+'%;"></div></div>'
+      +  '<div class="quota-meta"><span>Usadas: <strong>'+esc(String(quota.used))+'</strong> / '+esc(String(quota.limit))+'</span><span>Restantes: <strong>'+esc(String(quota.remaining))+'</strong></span><span>Reinicio previsto: <strong>'+esc(quota.resetLabel)+'</strong></span></div>'
+      +  alertHtml
+      +'</div>';
+  }
+  function recordGuestConnection(forceInactive){
+    if(!window.db) return;
+    try{
+      var authInst=(window.firebase && window.firebase.auth) ? window.firebase.auth() : null;
+      if(authInst && authInst.currentUser) return;
+    }catch(e){}
+    try{
+      var meta=getGuestSessionMeta();
+      var visitorId=getGuestVisitorId();
+      var now=new Date().toISOString();
+      guestTracker.visitorId=visitorId;
+      guestTracker.sessionId=meta.sessionId;
+      guestTracker.startedAt=meta.startedAt;
+      window.db.collection(GUEST_COLLECTION).doc(meta.sessionId).set({
+        type:'guest',
+        visitorId: visitorId,
+        sessionId: meta.sessionId,
+        displayName: guestNameFromId(visitorId),
+        startedAt: meta.startedAt,
+        lastSeen: now,
+        durationMs: guestDurationMs(meta.startedAt),
+        ua: navigator.userAgent||'',
+        activeNow: forceInactive ? false : true,
+        lastPath: (location.hash||location.pathname||'').slice(0,120)
+      },{merge:true});
+      noteEstimatedWrites(1);
+    }catch(e){}
+  }
+  function bindGuestListeners(){
+    if(guestTracker.listenersBound) return;
+    guestTracker.listenersBound=true;
+    window.addEventListener('visibilitychange',function(){
+      if(document.visibilityState==='visible') recordGuestConnection(false);
+      else recordGuestConnection(true);
+    });
+    window.addEventListener('focus',function(){ recordGuestConnection(false); });
+    window.addEventListener('pagehide',function(){ recordGuestConnection(true); });
+    window.addEventListener('beforeunload',function(){ recordGuestConnection(true); });
+  }
+  function startGuestTracking(){
+    if(guestTracker.active) return;
+    guestTracker.active=true;
+    bindGuestListeners();
+    recordGuestConnection(false);
+    guestTracker.interval=setInterval(function(){ recordGuestConnection(false); },180000);
+  }
+  function stopGuestTracking(){
+    if(guestTracker.interval){ clearInterval(guestTracker.interval); guestTracker.interval=null; }
+    if(guestTracker.active) recordGuestConnection(true);
+    guestTracker.active=false;
   }
 
   /* ── estilos del panel ── */
@@ -1272,6 +1503,15 @@ init();
     '.admin-msg{color:var(--muted);font-size:13px;text-align:center;padding:24px;}',
     '.admin-refresh{float:right;font-size:12px;color:var(--accent);cursor:pointer;border:none;background:transparent;font-weight:600;}',
     '.admin-refresh:hover{text-decoration:underline;}',
+    '.quota-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--panel);display:grid;gap:10px;}',
+    '.quota-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}',
+    '.quota-percent{font-family:"Outfit",sans-serif;font-size:24px;font-weight:800;color:var(--accent);white-space:nowrap;}',
+    '.quota-bar{height:12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);overflow:hidden;}',
+    '.quota-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px;transition:width .2s ease;}',
+    '.quota-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);}',
+    '.quota-alert{border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.45;border:1px solid var(--line);}',
+    '.quota-alert.warn{background:var(--warnbg);color:var(--warn);border-color:rgba(217,119,6,.28);}',
+    '.quota-alert.danger{background:var(--badbg);color:var(--bad);border-color:rgba(220,38,38,.28);}',
     '.score-pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;}',
     '.sp-ok{background:var(--okbg);color:var(--ok)}.sp-warn{background:var(--warnbg);color:var(--warn)}.sp-bad{background:var(--badbg);color:var(--bad)}.sp-muted{background:var(--panel);color:var(--muted)}'
   ].join('');
@@ -1294,6 +1534,7 @@ init();
     + '<div id="adminTabs" style="display:none;">'
     +   '<button class="admin-tab active" data-tab="users">👥 Usuarios</button>'
     +   '<button class="admin-tab" data-tab="connections">🕐 Conexiones</button>'
+    +   '<button class="admin-tab" data-tab="guests">🕵️ Invitados</button>'
     + '</div>'
     + '<div id="adminBody"></div>'
     + '</div>';
@@ -1313,6 +1554,7 @@ init();
     document.querySelectorAll('.admin-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab===currentTab); });
     if(currentTab==='users') loadUsersTab();
     else if(currentTab==='connections') loadConnectionsTab();
+    else if(currentTab==='guests') loadGuestsTab();
   });
 
   /* ── HELPERS ── */
@@ -1351,6 +1593,18 @@ init();
     if(/Macintosh|Mac OS/.test(ua)) return '🖥 Mac';
     if(/Linux/.test(ua)) return '🖥 Linux';
     return '🌐';
+  }
+  function durationText(ms){
+    ms=Number(ms||0);
+    if(ms<60000) return '< 1 min';
+    var mins=Math.round(ms/60000);
+    if(mins<60) return mins+' min';
+    var h=Math.floor(mins/60), m=mins%60;
+    return h+' h'+(m?(' '+m+' min'):'');
+  }
+  function guestIsActive(lastSeen){
+    if(!lastSeen) return false;
+    return (Date.now()-new Date(lastSeen).getTime())<60000;
   }
 
   function subjectStats(prog, subKey){
@@ -1598,10 +1852,15 @@ init();
     body.innerHTML='<div class="admin-msg">⏳ Cargando historial...</div>';
     try{
       if(!window.db) throw {code:'db-unavailable',message:'Firestore no inicializado.'};
-      var snap=await window.db.collection('connections')
-        .orderBy('timestamp','desc')
-        .limit(100)
-        .get();
+      var data=await Promise.all([
+        window.db.collection('connections')
+          .orderBy('timestamp','desc')
+          .limit(100)
+          .get(),
+        getQuotaUsageSummary()
+      ]);
+      var snap=data[0];
+      var quota=data[1];
 
       if(snap.empty){
         body.innerHTML='<div class="admin-msg">Aún no hay conexiones registradas. Se registrarán a partir de ahora al iniciar sesión.</div>';
@@ -1626,8 +1885,8 @@ init();
 
       sub.textContent=snap.size+' conexiones registradas · '+Object.keys(allEmails).length+' usuarios únicos';
 
-      var html=
-        '<div class="admin-summary">'
+      var html=renderQuotaWidget(quota)
+        +'<div class="admin-summary">'
         +'<div class="admin-box"><div class="abox-label">Conexiones totales</div><div class="abox-val">'+snap.size+'</div></div>'
         +'<div class="admin-box"><div class="abox-label">Usuarios únicos</div><div class="abox-val">'+Object.keys(allEmails).length+'</div></div>'
         +'</div>';
@@ -1658,6 +1917,84 @@ init();
     }
   }
 
+
+  async function loadGuestsTab(){
+    var body=document.getElementById('adminBody');
+    var sub=document.getElementById('adminSub');
+    sub.textContent='Historial de invitados';
+    body.innerHTML='<div class="admin-msg">⏳ Cargando invitados...</div>';
+    try{
+      if(!window.db) throw {code:'db-unavailable',message:'Firestore no inicializado.'};
+      var data=await Promise.all([
+        window.db.collection(GUEST_COLLECTION)
+          .orderBy('lastSeen','desc')
+          .limit(100)
+          .get(),
+        getQuotaUsageSummary()
+      ]);
+      var snap=data[0];
+      var quota=data[1];
+
+      if(snap.empty){
+        body.innerHTML='<div class="admin-msg">Aún no hay invitados registrados. Se crearán al entrar sin login.</div>';
+        return;
+      }
+
+      var byDay={}, dayOrder=[], visitors={}, activeNow=0, totalDuration=0;
+      snap.forEach(function(d){
+        var data=d.data()||{};
+        var ts=data.startedAt||data.lastSeen||'';
+        var day=ts?ts.slice(0,10):'sin-fecha';
+        if(!byDay[day]){ byDay[day]=[]; dayOrder.push(day); }
+        byDay[day].push(data);
+        if(data.visitorId) visitors[data.visitorId]=1;
+        if(guestIsActive(data.lastSeen||data.startedAt)) activeNow++;
+        totalDuration+=Number(data.durationMs||0);
+      });
+
+      sub.textContent=snap.size+' sesiones invitado · '+Object.keys(visitors).length+' invitados únicos';
+
+      var avgDuration=snap.size?durationText(totalDuration/snap.size):'0 min';
+      var html=renderQuotaWidget(quota)
+        +'<div class="admin-summary">'
+        +'<div class="admin-box"><div class="abox-label">Sesiones invitado</div><div class="abox-val">'+snap.size+'</div></div>'
+        +'<div class="admin-box"><div class="abox-label">Invitados únicos</div><div class="abox-val">'+Object.keys(visitors).length+'</div></div>'
+        +'<div class="admin-box"><div class="abox-label">Activos ahora</div><div class="abox-val">'+activeNow+'</div></div>'
+        +'<div class="admin-box"><div class="abox-label">Duración media</div><div class="abox-val" style="font-size:18px;">'+esc(avgDuration)+'</div></div>'
+        +'</div>';
+
+      for(var di=0;di<dayOrder.length;di++){
+        var day=dayOrder[di];
+        var entries=byDay[day];
+        var dayLabel=day==='sin-fecha'?'Sin fecha':new Date(day+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+        html+='<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 4px;border-bottom:2px solid var(--line);">'+esc(dayLabel)+' <span style="font-weight:400;">('+entries.length+' sesiones)</span></div>';
+        html+='<div>';
+        for(var ei=0;ei<entries.length;ei++){
+          var e=entries[ei]||{};
+          var started=e.startedAt||'';
+          var active=guestIsActive(e.lastSeen||started);
+          var statePill=active
+            ? '<span class="score-pill sp-ok">Activo ahora</span>'
+            : '<span class="score-pill sp-muted">Inactivo</span>';
+          html+=
+            '<div class="conn-row" style="align-items:flex-start;">'
+            +'<span class="conn-time">'+esc(started?started.slice(11,16):'--:--')+' · '+rel(e.lastSeen||started)+'</span>'
+            +'<span class="conn-user">'+esc(e.displayName||guestNameFromId(e.visitorId||''))
+            +'<br><span style="font-size:11px;color:var(--muted);font-weight:400;">visitorId: '+esc(e.visitorId||'')+' · sessionId: '+esc(e.sessionId||'')+'</span>'
+            +'<br><span style="font-size:11px;color:var(--muted);font-weight:400;">Inicio: '+esc(fullDate(e.startedAt))+' · Última actividad: '+esc(fullDate(e.lastSeen))+' · Duración: '+esc(durationText(e.durationMs))+'</span></span>'
+            +'<span class="conn-dev" style="text-align:right;">'+statePill+'<br><span style="display:inline-block;margin-top:6px;">'+esc(deviceShort(e.ua||''))+'</span></span>'
+            +'</div>';
+        }
+        html+='</div>';
+      }
+
+      body.innerHTML=html;
+    }catch(e){
+      renderAdminError(e);
+      try{ console.error('ADMIN_GUESTS_ERROR',e); }catch(_){}
+    }
+  }
+
   /* ── MAIN PANEL LOADER ── */
   function loadPanel(){
     document.getElementById('adminTabs').style.display='flex';
@@ -1682,7 +2019,12 @@ init();
           var isAdmin=user && user.email===ADMIN_EMAIL;
           fab.style.display=isAdmin?'flex':'none';
           if(!isAdmin){ isUnlocked=false; overlay.classList.remove('open'); }
-          if(user) saveUserMeta(user);
+          if(user){
+            stopGuestTracking();
+            saveUserMeta(user);
+          }else{
+            startGuestTracking();
+          }
         });
         return true;
       }catch(e){}
@@ -1691,6 +2033,7 @@ init();
   }
 
   if(!attachAuthListener()){
+    startGuestTracking();
     var tries=0;
     var ticker=setInterval(function(){
       tries++;
