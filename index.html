@@ -1174,10 +1174,9 @@ init();
 </script>
 
 <script>
-/* ── PANEL ADMIN MEJORADO ── solo para gomis89@gmail.com + código 5291 ── */
+/* ── PANEL ADMIN MEJORADO ── solo para gomis89@gmail.com autenticado ── */
 (function(){
   var ADMIN_EMAIL = 'gomis89@gmail.com';
-  var ADMIN_CODE  = '5291';
   var ALL_SUBJECTS = ['PIICT','TPIDA','TPIE','Optativo','Sostenibilidad','IPE II','Inglés'];
   var GUEST_COLLECTION = 'guestConnections';
   var QUOTA_COLLECTION = 'quotaUsage';
@@ -1528,7 +1527,7 @@ init();
   overlay.innerHTML=
     '<div id="adminModal">'
     + '<div id="adminHead">'
-    +   '<div><h3>Panel de administrador</h3><small id="adminSub">Acceso restringido</small></div>'
+    +   '<div><h3>Panel de administrador</h3><small id="adminSub">Solo visible para gomis89@gmail.com autenticado</small></div>'
     +   '<button id="adminClose">&#x2715;</button>'
     + '</div>'
     + '<div id="adminTabs" style="display:none;">'
@@ -1647,40 +1646,6 @@ init();
       subs.push(key);
     }
     return {sessions:s, answered:a, correct:c, timeMin:Math.round(ms/60000), subjects:subs};
-  }
-
-  /* ── GATE ── */
-  function renderGate(){
-    document.getElementById('adminTabs').style.display='none';
-    var sub=document.getElementById('adminSub');
-    sub.textContent='Introduce el código de 4 dígitos';
-    var body=document.getElementById('adminBody');
-    body.innerHTML=
-      '<div class="admin-gate">'
-      + '<div class="small" style="text-align:center;">Acceso exclusivo del administrador</div>'
-      + '<input id="adminCodeInput" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">'
-      + '<div id="adminError" class="admin-error"></div>'
-      + '<div class="admin-actions">'
-      +   '<button class="btn ghost" id="adminCancelBtn" type="button">Cancelar</button>'
-      +   '<button class="btn primary" id="adminUnlockBtn" type="button">Entrar</button>'
-      + '</div>'
-      + '</div>';
-    var input=document.getElementById('adminCodeInput');
-    var err=document.getElementById('adminError');
-    function tryUnlock(){
-      if((input.value||'').trim()===ADMIN_CODE){
-        isUnlocked=true;
-        document.getElementById('adminTabs').style.display='flex';
-        loadUsersTab();
-      }else{
-        err.textContent='Código incorrecto.';
-        input.value=''; input.focus();
-      }
-    }
-    document.getElementById('adminCancelBtn').addEventListener('click',function(){ overlay.classList.remove('open'); });
-    document.getElementById('adminUnlockBtn').addEventListener('click',tryUnlock);
-    input.addEventListener('keydown',function(e){ if(e.key==='Enter') tryUnlock(); });
-    setTimeout(function(){ try{ input.focus(); }catch(e){} },30);
   }
 
   /* ── ERROR RENDERING ── */
@@ -2006,8 +1971,7 @@ init();
   /* ── FAB CLICK ── */
   fab.addEventListener('click',function(){
     overlay.classList.add('open');
-    if(isUnlocked) loadPanel();
-    else renderGate();
+    loadPanel();
   });
 
   /* ── AUTH LISTENER ── */
@@ -2016,9 +1980,10 @@ init();
       try{
         var authInst=window.firebase.auth();
         authInst.onAuthStateChanged(function(user){
-          var isAdmin=user && user.email===ADMIN_EMAIL;
+          var isAdmin=!!(user && user.email===ADMIN_EMAIL);
+          isUnlocked=isAdmin;
           fab.style.display=isAdmin?'flex':'none';
-          if(!isAdmin){ isUnlocked=false; overlay.classList.remove('open'); }
+          if(!isAdmin){ overlay.classList.remove('open'); }
           if(user){
             stopGuestTracking();
             saveUserMeta(user);
