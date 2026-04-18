@@ -139,6 +139,39 @@ html.dark .topbar{background:rgba(8,13,24,.88)}
 }
 .subject-status-gif.empty,.subject-status-gif-empty{opacity:.28;filter:grayscale(1);visibility:hidden}
 
+.gif-legend{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
+.gif-legend-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--panel2);
+}
+.gif-legend-item img{
+  width:68px;
+  height:68px;
+  object-fit:contain;
+  border-radius:12px;
+  flex-shrink:0;
+}
+.gif-legend-item span{
+  font-size:13.5px;
+  color:var(--text);
+  font-weight:600;
+}
+@media(max-width:700px){
+  .gif-legend-item img{
+    width:76px;
+    height:76px;
+  }
+}
+
 .subject-labels{
   width:100%;
   min-width:0;
@@ -709,6 +742,28 @@ textarea.share-preview:focus{outline:none;border-color:rgba(var(--accent-rgb),.5
             <span class="score-fail">Rojo: menos de 5</span>
             <span class="score-pass-just">Amarillo: de 5 a 5,99</span>
             <span class="score-pass-good">Verde: 6 o más</span>
+          </div>
+          <div class="gif-legend">
+            <div class="gif-legend-item">
+              <img src="studio1.gif" alt="Reacción para 9 o más">
+              <span>9 o más</span>
+            </div>
+            <div class="gif-legend-item">
+              <img src="studio6.gif" alt="Reacción para 8 a menos de 9">
+              <span>8 a menos de 9</span>
+            </div>
+            <div class="gif-legend-item">
+              <img src="studio5.gif" alt="Reacción para 6 a menos de 8">
+              <span>6 a menos de 8</span>
+            </div>
+            <div class="gif-legend-item">
+              <img src="studio2.gif" alt="Reacción para 5 a menos de 6">
+              <span>5 a menos de 6</span>
+            </div>
+            <div class="gif-legend-item">
+              <img src="studio4.gif" alt="Reacción para menos de 5">
+              <span>Menos de 5</span>
+            </div>
           </div>
         </div>
         <div class="panel help-card">
