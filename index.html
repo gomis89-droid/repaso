@@ -834,13 +834,30 @@ body.quiz-active{}
 .r-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:99px;border:1px solid var(--line);background:var(--paper-2);font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:all .15s}
 .r-chip:hover{border-color:var(--p3)}
 .r-chip.active{background:linear-gradient(90deg,var(--p1),var(--p3));border-color:transparent;color:#fff}
-.r-sparkline{height:140px;background:var(--paper-2);border-radius:12px;padding:12px;position:relative}
-.r-sparkline svg{width:100%;height:100%;display:block;overflow:visible}
+.r-sparkline{min-height:140px;background:var(--paper-2);border-radius:12px;padding:12px;position:relative}
+.r-sparkline.line-mode{height:140px}
+.r-sparkline.line-mode svg{width:100%;height:100%;display:block;overflow:visible}
 .r-sparkline .yaxis,.r-sparkline .axis-max,.r-sparkline .axis-min{position:absolute;font-size:10px;color:var(--ink-3);font-family:var(--font-mono)}
 .r-sparkline .yaxis{top:12px;left:14px}
 .r-sparkline .axis-max{top:12px;right:14px}
 .r-sparkline .axis-min{bottom:12px;right:14px}
-.r-sparkline .empty-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:13px;font-style:italic}
+.r-sparkline .empty-msg{min-height:116px;display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:13px;font-style:italic}
+.r-bars7{position:relative;padding-top:6px}
+.r-bars7 .max-lbl{position:absolute;top:0;left:2px;font-size:10px;color:var(--ink-3);font-family:var(--font-mono);font-weight:700}
+.r-bars7 .bars{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;height:110px;align-items:end;margin-top:16px;padding:0 4px}
+.r-bars7 .col{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;cursor:default}
+.r-bars7 .val{font-size:11px;font-weight:800;color:var(--ink);line-height:1;min-height:12px}
+.r-bars7 .bar{width:100%;max-width:42px;background:linear-gradient(180deg,var(--p1),var(--p3));border-radius:6px 6px 2px 2px;min-height:2px;transition:filter .15s}
+.r-bars7 .bar.zero{background:color-mix(in oklab,var(--ink-3) 40%,transparent);opacity:.45;min-height:4px}
+.r-bars7 .bar.today{background:linear-gradient(180deg,#fff 0%,var(--p1) 40%,var(--p3));box-shadow:0 0 14px color-mix(in oklab,var(--p1) 55%,transparent)}
+.r-bars7 .col:hover .bar{filter:brightness(1.15)}
+.r-bars7 .tip{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:5px 9px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:5}
+.r-bars7 .col:hover .tip{opacity:1}
+.r-bars7 .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--ink)}
+.r-bars7 .day-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:8px;padding:0 4px}
+.r-bars7 .day-labels span{text-align:center;font-size:13px;font-weight:800;color:var(--ink-3)}
+.r-bars7 .day-labels span.today{color:var(--p1)}
+.r-bars7 .week-lbl{margin-top:10px;padding-top:8px;border-top:1px solid var(--line);text-align:center;font-size:12px;color:var(--ink-3);font-weight:700;letter-spacing:.02em}
 .r-section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px}
 .r-section h3{margin:0 0 14px;font-size:16px;font-family:var(--font-display)}
 .exam-table{width:100%;border-collapse:collapse;font-size:13px}
@@ -1992,27 +2009,60 @@ function renderProgressSparkline(sub){
   var el=document.getElementById('progressSparkline'); if(!el) return;
   var metric=progressChartMetric;
   var hist=(sub&&sub.history)||[];
+  el.classList.remove('line-mode');
   if(metric==='nota'){
+    el.classList.add('line-mode');
     var scores=[]; for(var i=hist.length-1;i>=0;i--){ var h=hist[i]||{}; if(typeof h.score==='number' && isExamMode(h.mode)) scores.push(h.score); }
     scores=scores.slice(-15);
     if(!scores.length){ el.innerHTML='<div class="empty-msg">Sin notas de examen todavía</div>'; return; }
     var best=Math.max.apply(null, scores);
     el.innerHTML='<span class="yaxis">10</span><span class="axis-max">mejor '+best.toFixed(1)+'</span><span class="axis-min">0</span>'+buildSparklineSvg(scores, 0, 10);
   } else if(metric==='acierto'){
+    el.classList.add('line-mode');
     var pcts=[]; for(var j=hist.length-1;j>=0;j--){ var hh=hist[j]||{}; if(typeof hh.percent==='number') pcts.push(hh.percent); }
     pcts=pcts.slice(-15);
     if(!pcts.length){ el.innerHTML='<div class="empty-msg">Sin sesiones registradas</div>'; return; }
     var bestP=Math.max.apply(null, pcts);
     el.innerHTML='<span class="yaxis">100%</span><span class="axis-max">mejor '+bestP.toFixed(0)+'%</span><span class="axis-min">0%</span>'+buildSparklineSvg(pcts, 0, 100);
   } else {
-    var buckets={}; var today=new Date(); var yAll=[];
-    for(var d=13;d>=0;d--){ var dt=new Date(today); dt.setDate(today.getDate()-d); var k=dt.toISOString().slice(0,10); buckets[k]=0; }
-    for(var m=0;m<hist.length;m++){ var e=hist[m]||{}; var kk=(e.finishedAt||'').slice(0,10); if(kk && buckets.hasOwnProperty(kk)) buckets[kk]++; }
-    var keys=Object.keys(buckets); var vals=keys.map(function(k){ return buckets[k]; });
+    /* Sesiones/día — últimos 7 días */
+    var DAY_LETTERS=['D','L','M','X','J','V','S']; /* getDay(): 0=dom ... 6=sab */
+    var DAY_NAMES=['dom','lun','mar','mié','jue','vie','sáb'];
+    var MONTH_ABBR=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    var today=new Date(); today.setHours(12,0,0,0);
+    function localKey(d){ var y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); return y+'-'+m+'-'+dd; }
+    var days=[]; for(var d=6;d>=0;d--){ var dt=new Date(today); dt.setDate(today.getDate()-d); days.push(dt); }
+    var counts={}; for(var p=0;p<days.length;p++) counts[localKey(days[p])]=0;
+    for(var m2=0;m2<hist.length;m2++){ var e=hist[m2]||{}; var kk=(e.finishedAt||'').slice(0,10); if(kk && counts.hasOwnProperty(kk)) counts[kk]++; }
+    var vals=days.map(function(x){ return counts[localKey(x)]; });
     var totalSessions=vals.reduce(function(a,b){return a+b;},0);
-    if(!totalSessions){ el.innerHTML='<div class="empty-msg">Sin actividad en los últimos 14 días</div>'; return; }
+    if(!totalSessions){
+      var firstD=days[0], lastD=days[6];
+      var rangeTxt=firstD.getDate()+' – '+lastD.getDate()+' '+MONTH_ABBR[lastD.getMonth()]+' '+lastD.getFullYear();
+      el.innerHTML='<div class="r-bars7"><div class="empty-msg">Sin actividad en los últimos 7 días</div><div class="week-lbl"><b>'+rangeTxt+'</b></div></div>';
+      return;
+    }
     var mx=Math.max.apply(null, vals)||1;
-    el.innerHTML='<span class="yaxis">'+mx+'</span><span class="axis-max">'+totalSessions+' sesiones</span><span class="axis-min">0</span>'+buildBarsSvg(vals, mx);
+    var barsHtml=''; var labelsHtml='';
+    for(var q=0;q<days.length;q++){
+      var day=days[q]; var v=vals[q]; var isToday=(q===days.length-1);
+      var heightPct=(v/mx)*100;
+      var barCls=isToday && v>0 ? 'bar today' : (v===0 ? 'bar zero' : 'bar');
+      var barStyle=v>0 ? ' style="height:'+heightPct.toFixed(1)+'%"' : '';
+      var valStr=v>0 ? String(v) : '&nbsp;';
+      var tipTxt=DAY_NAMES[day.getDay()]+' '+day.getDate()+'/'+(day.getMonth()+1)+' · '+v+' '+(v===1?'sesión':'sesiones');
+      barsHtml+='<div class="col"><span class="val">'+valStr+'</span><div class="'+barCls+'"'+barStyle+'></div><div class="tip">'+(isToday?'<b>'+tipTxt+'</b>':tipTxt)+'</div></div>';
+      var letter=DAY_LETTERS[day.getDay()];
+      labelsHtml+='<span'+(isToday?' class="today"':'')+'>'+letter+'</span>';
+    }
+    var firstDay=days[0], lastDay=days[6];
+    var rangeTxt2;
+    if(firstDay.getMonth()===lastDay.getMonth()){
+      rangeTxt2=firstDay.getDate()+' – '+lastDay.getDate()+' '+MONTH_ABBR[lastDay.getMonth()]+' '+lastDay.getFullYear();
+    } else {
+      rangeTxt2=firstDay.getDate()+' '+MONTH_ABBR[firstDay.getMonth()]+' – '+lastDay.getDate()+' '+MONTH_ABBR[lastDay.getMonth()]+' '+lastDay.getFullYear();
+    }
+    el.innerHTML='<div class="r-bars7"><div class="max-lbl">máx '+mx+'</div><div class="bars">'+barsHtml+'</div><div class="day-labels">'+labelsHtml+'</div><div class="week-lbl"><b>'+rangeTxt2+'</b></div></div>';
   }
 }
 function renderProgressExamTable(sub, short){
