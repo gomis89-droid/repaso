@@ -806,6 +806,79 @@ body.auth-logged-in{}
 body.auth-logged-out{}
 body.quiz-active{}
 
+/* ========== REGISTRO (redesign) ========== */
+.r-grid{display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start}
+@media(max-width:900px){.r-grid{grid-template-columns:1fr}}
+.subj-list{padding:10px;margin-bottom:14px}
+.subj-list-title{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--ink-3);padding:8px 12px 10px;text-transform:uppercase}
+.subj-row{display:flex;align-items:center;gap:4px;border-radius:10px;margin-bottom:2px;transition:background .15s}
+.subj-row:hover{background:color-mix(in oklab,var(--p3) 8%,transparent)}
+.subj-row.active{background:linear-gradient(90deg,var(--p1),var(--p3));box-shadow:0 4px 12px color-mix(in oklab,var(--p3) 30%,transparent)}
+.subj-row.active .subj-item,.subj-row.active .subj-share{color:#fff;}
+.subj-item{flex:1;text-align:left;padding:12px 14px;border:0;background:transparent;color:var(--ink);font-family:inherit;font-size:14px;font-weight:700;border-radius:10px;cursor:pointer;}
+.subj-share{flex:0 0 auto;width:34px;height:34px;margin-right:6px;display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:color-mix(in oklab,var(--ink) 55%,transparent);border-radius:8px;cursor:pointer;font-size:16px;transition:background .15s,color .15s,transform .15s;}
+.subj-share:hover{background:color-mix(in oklab,var(--p3) 14%,transparent);color:var(--p3);transform:translateY(-1px);}
+.subj-row.active .subj-share:hover{background:rgba(255,255,255,.18);color:#fff;}
+.r-kpi-list{padding:6px 18px}
+.r-kpi-list .item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.r-kpi-list .item:last-child{border-bottom:0}
+.r-kpi-list .l{color:var(--ink-3);font-size:13px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em}
+.r-kpi-list .v{font-family:var(--font-display);font-size:22px;font-weight:800}
+.r-streak{padding:14px 16px;background:linear-gradient(135deg,color-mix(in oklab,var(--ok) 22%,var(--card)),color-mix(in oklab,var(--ok) 10%,var(--card)));border-radius:14px;border:1px solid color-mix(in oklab,var(--ok) 28%,transparent);margin-top:14px}
+.r-streak .t{font-size:12px;color:var(--ink-3);font-weight:700;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em}
+.r-streak .v{font-family:var(--font-display);font-size:26px;font-weight:900;color:var(--ok);margin-top:4px}
+.r-hero-chart{background:linear-gradient(135deg,color-mix(in oklab,var(--p3) 14%,var(--card)),color-mix(in oklab,var(--p1) 10%,var(--card)));border:1px solid color-mix(in oklab,var(--p3) 22%,transparent);border-radius:16px;padding:20px;margin-bottom:14px}
+.r-hero-chart .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.r-hero-chart h3{margin:0;font-size:17px;font-family:var(--font-display)}
+.r-hero-chart .chart-chips{display:flex;gap:6px;flex-wrap:wrap}
+.r-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:99px;border:1px solid var(--line);background:var(--paper-2);font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:all .15s}
+.r-chip:hover{border-color:var(--p3)}
+.r-chip.active{background:linear-gradient(90deg,var(--p1),var(--p3));border-color:transparent;color:#fff}
+.r-sparkline{height:140px;background:var(--paper-2);border-radius:12px;padding:12px;position:relative}
+.r-sparkline svg{width:100%;height:100%;display:block;overflow:visible}
+.r-sparkline .yaxis,.r-sparkline .axis-max,.r-sparkline .axis-min{position:absolute;font-size:10px;color:var(--ink-3);font-family:var(--font-mono)}
+.r-sparkline .yaxis{top:12px;left:14px}
+.r-sparkline .axis-max{top:12px;right:14px}
+.r-sparkline .axis-min{bottom:12px;right:14px}
+.r-sparkline .empty-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:13px;font-style:italic}
+.r-section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px}
+.r-section h3{margin:0 0 14px;font-size:16px;font-family:var(--font-display)}
+.exam-table{width:100%;border-collapse:collapse;font-size:13px}
+.exam-table th{text-align:left;padding:10px 12px;color:var(--ink-3);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--line);font-family:var(--font-mono)}
+.exam-table td{padding:12px;border-bottom:1px solid var(--line)}
+.exam-table tr:last-child td{border-bottom:0}
+.exam-table .tipo{font-weight:800;font-size:14px}
+.exam-table .intentos{color:var(--ink-3)}
+.exam-table .best{color:var(--ok);font-weight:800}
+.exam-table .avg{font-weight:700}
+.exam-table .ultimas{font-family:var(--font-mono);font-size:12px;color:var(--ink-3)}
+.exam-table .ultimas span.nota{display:inline-block;padding:2px 6px;margin:0 2px;border-radius:4px;background:var(--paper-2);color:var(--ink);font-weight:700}
+.exam-table .empty{color:var(--ink-3);font-style:italic}
+.mode-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--paper-2);border-radius:10px;margin-bottom:8px;gap:10px;flex-wrap:wrap}
+.mode-row:last-child{margin-bottom:0}
+.mode-row .l{font-weight:700}
+.mode-row .stats{font-size:13px;color:var(--ink-3);font-family:var(--font-mono)}
+.sess-row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center;font-size:13px}
+.sess-row:last-child{border-bottom:0}
+.sess-row .mode-pill{padding:3px 9px;border-radius:99px;background:color-mix(in oklab,var(--p3) 18%,transparent);color:var(--p3);font-size:11px;font-weight:800;white-space:nowrap}
+.sess-row .when{color:var(--ink-3);font-family:var(--font-mono);font-size:12px}
+.sess-row .stats-mid{color:var(--ink-2);font-size:13px}
+.share-float-wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.share-step{margin-bottom:22px}
+.share-step h4{margin:0 0 10px;font-size:12px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;font-weight:800;display:flex;align-items:center;gap:8px;font-family:var(--font-mono)}
+.step-num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:linear-gradient(90deg,var(--p1),var(--p3));color:#fff;font-size:12px;align-items:center;justify-content:center;font-weight:900;font-family:var(--font-display)}
+.cbox{display:flex;gap:8px;align-items:center;padding:10px 14px;background:var(--paper-2);border:1px solid var(--line);border-radius:10px;font-size:13px;cursor:pointer;transition:all .15s}
+.cbox:hover{border-color:var(--p3)}
+.cbox input{accent-color:var(--p3);width:15px;height:15px}
+.cbox:has(input:checked){border-color:var(--p3);background:color-mix(in oklab,var(--p3) 8%,var(--paper-2))}
+.cbox-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.cbox-group{margin-bottom:14px}
+.cbox-group .g-title{font-size:11px;font-weight:800;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:var(--font-mono)}
+.preview-box{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:16px;font-family:var(--font-mono);font-size:12px;color:var(--ink-2);white-space:pre-wrap;line-height:1.6;min-height:120px;max-height:400px;overflow:auto}
+.share-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;border:1px solid var(--line);background:var(--paper-2);font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:all .15s}
+.share-chip:hover{border-color:var(--p3)}
+.share-chip.active{background:linear-gradient(90deg,var(--p1),var(--p3));border-color:transparent;color:#fff}
+.r-title-gradient{background:linear-gradient(90deg,var(--p1),var(--p3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--font-display);font-weight:900}
 </style>
 </head>
 <body><body>
@@ -837,11 +910,8 @@ body.quiz-active{}
     <div class="card hero">
       <div class="exam-countdown" id="examCountdown" aria-live="polite">
         <div class="exam-countdown-top">
-          <div>
-            <div class="exam-countdown-label">&#x23F3; Cuenta atrás para los exámenes</div>
-            <div class="exam-countdown-date">Empiezan el 10/05/2026 a las 09:00</div>
-          </div>
-          <div class="hero-chip" style="margin:0;">Inicio oficial · 10/05/2026</div>
+          <div class="exam-countdown-label">&#x23F3; Cuenta atrás para los exámenes</div>
+          <div class="hero-chip" style="margin:0;">Inicio oficial · 10/05/2026 · 09:00</div>
         </div>
         <div class="exam-countdown-grid">
           <div class="exam-countdown-box">
@@ -857,17 +927,12 @@ body.quiz-active{}
             <div class="exam-countdown-unit">Minutos</div>
           </div>
         </div>
-        <div class="exam-countdown-status" id="examCountdownStatus">Calculando tiempo restante...</div>
       </div>
       <h2>Hola, hoy toca <span class="accent">machacar</span> el temario &#x1F4AA;</h2>
       <p class="hero-sub">Elige una asignatura y dale caña al repaso. El examen se acerca.</p>
       <div class="hero-stats">
         <button class="hero-chip" id="appHelpBtn" type="button" style="cursor:pointer;font:inherit;border:1px solid color-mix(in oklab,var(--p3) 30%,transparent);background:color-mix(in oklab,var(--p3) 14%,var(--card));color:var(--p3);">&#x2753; Cómo funciona</button>
       </div>
-    </div>
-    <div class="section-head">
-      <h3>Tus asignaturas</h3>
-      <small>8 materias</small>
     </div>
     <div class="subject-grid" id="subjectGrid"></div>
     <div id="homeStatsSection" style="display:none;"></div>
@@ -1071,59 +1136,88 @@ body.quiz-active{}
 
   <!-- PROGRESS SCREEN -->
   <section id="screen-progress" class="screen">
-    <div class="card" style="padding:24px;margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px;">
-        <div>
-          <h2 style="margin:0 0 6px;">Registro de progreso</h2>
-          <div class="subtle" id="progressSubjectTitle"></div>
+    <div class="share-float-wrap">
+      <h2 class="r-title-gradient" style="margin:0;font-size:26px;">&#x1F4CA; Registro de progreso</h2>
+      <div class="subtle" id="progressLastPlayed" style="margin:0;"></div>
+    </div>
+    <div class="r-grid">
+      <div class="r-left">
+        <div class="card subj-list" id="progressSubjectList">
+          <div class="subj-list-title">Asignaturas</div>
         </div>
-        <div class="subject-switch" id="progressSubjectSwitch"></div>
+        <div class="card r-kpi-list" id="progressKpiList"></div>
+        <div class="r-streak" id="progressStreakCard">
+          <div class="t">&#x1F525; Racha actual</div>
+          <div class="v" id="progressStreakValue">0 días</div>
+        </div>
       </div>
-      <div class="subtle" id="progressLastPlayed" style="margin-bottom:18px;"></div>
-      <div class="prog-grid">
-        <div class="card" style="padding:18px;">
-          <div class="subtle">Sesiones</div>
-          <div class="bignum" id="overallSessions">0</div>
+      <div class="r-right">
+        <div class="r-hero-chart">
+          <div class="head">
+            <h3 id="progressHeroTitle">Evolución</h3>
+            <div class="chart-chips" id="progressChartChips">
+              <button class="r-chip active" data-metric="nota">Nota</button>
+              <button class="r-chip" data-metric="acierto">% Acierto</button>
+              <button class="r-chip" data-metric="sesiones">Sesiones/día</button>
+            </div>
+          </div>
+          <div class="r-sparkline" id="progressSparkline"></div>
         </div>
-        <div class="card" style="padding:18px;">
-          <div class="subtle">% Acierto</div>
-          <div class="bignum" id="overallAccuracy">0%</div>
+        <div class="r-section">
+          <h3>&#x1F3AF; Por tipo de examen</h3>
+          <div style="overflow-x:auto;"><table class="exam-table"><thead><tr><th>Tipo</th><th>Intentos</th><th>Mejor</th><th>Media</th><th>Últimas 3</th></tr></thead><tbody id="progressExamTableBody"></tbody></table></div>
         </div>
-        <div class="card" style="padding:18px;">
-          <div class="subtle">% Fallo</div>
-          <div class="bignum" id="overallFailure">0%</div>
+        <div class="r-section">
+          <h3>&#x1F4DA; Estudio libre</h3>
+          <div id="progressFreeStudy"></div>
         </div>
-        <div class="card" style="padding:18px;">
-          <div class="subtle">Preguntas</div>
-          <div class="bignum" id="overallAnswered">0</div>
-        </div>
-        <div class="card" style="padding:18px;">
-          <div class="subtle">Tiempo total</div>
-          <div class="bignum" id="overallTime">0 min</div>
-        </div>
-        <div class="card" style="padding:18px;">
-          <div class="subtle">Días activo</div>
-          <div class="bignum" id="overallDays">0</div>
+        <div class="r-section">
+          <h3>&#x1F570;&#xFE0F; Últimas sesiones</h3>
+          <div id="progressLastSessions"></div>
         </div>
       </div>
     </div>
-    <div id="examStatsGrid" class="result-grid" style="margin-bottom:16px;"></div>
-    <div class="card" style="padding:24px;margin-bottom:16px;">
-      <h3 style="margin:0 0 14px;font-family:var(--font-display);font-size:17px;">Por modo de estudio</h3>
-      <div id="modeProgressGrid" class="prog-grid"></div>
+    <!-- Hidden legacy elements kept for backwards compat with any stray references (unused visually) -->
+    <div style="display:none;">
+      <div id="progressSubjectTitle"></div><div id="progressSubjectSwitch"></div>
+      <span id="overallSessions"></span><span id="overallAccuracy"></span><span id="overallFailure"></span><span id="overallAnswered"></span><span id="overallTime"></span><span id="overallDays"></span>
+      <div id="examStatsGrid"></div><div id="modeProgressGrid"></div>
     </div>
-    <div class="card" style="padding:24px;">
-      <h3 style="margin:0 0 14px;font-family:var(--font-display);font-size:17px;">Compartir registro</h3>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="shareSubjectOptions"></div>
-      <div class="checkbox-grid" id="shareMetricOptions"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0;">
-        <button class="btn ghost small" id="selectAllMetricsBtn">Seleccionar todo</button>
+  </section>
+
+  <!-- SHARE SCREEN -->
+  <section id="screen-share" class="screen">
+    <button class="btn ghost small" id="shareBackBtn" style="margin-bottom:16px;">&#x2190; Volver al Registro</button>
+    <div class="card" style="padding:28px;">
+      <h2 class="r-title-gradient" style="margin:0 0 4px;font-size:24px;">&#x2197; Compartir registro</h2>
+      <div class="subtle" style="margin-bottom:22px;">Elige qué datos quieres incluir en el texto exportado.</div>
+
+      <div class="share-step">
+        <h4><span class="step-num">1</span> Asignatura</h4>
+        <div id="shareSubjectChips" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+
+      <div class="share-step">
+        <h4><span class="step-num">2</span> Métricas a incluir</h4>
+        <div id="shareMetricGroups"></div>
+      </div>
+
+      <div class="share-step">
+        <h4><span class="step-num">3</span> Vista previa</h4>
+        <pre class="preview-box" id="sharePreviewBox"></pre>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn primary small" id="shareMetricsNowBtn">&#x2197; Compartir</button>
-        <button class="btn ghost small" id="downloadTxtBtn">&#x2193; Descargar</button>
-        <button class="btn danger small" id="resetSubjectProgressBtn">&#x1F5D1; Resetear</button>
+        <button class="btn small" id="downloadTxtBtn">&#x2193; Descargar .txt</button>
+        <button class="btn ghost small" id="selectAllMetricsBtn">Seleccionar todo</button>
+        <button class="btn ghost small" id="deselectAllMetricsBtn">Quitar todo</button>
+        <button class="btn danger small" id="resetSubjectProgressBtn" style="margin-left:auto;">&#x1F5D1; Resetear asignatura</button>
       </div>
-      <div id="sharePreviewBox"></div>
     </div>
+    <!-- legacy hidden container -->
+    <div style="display:none;" id="shareSubjectOptions"></div>
+    <div style="display:none;" id="shareMetricOptions"></div>
   </section>
 
 </div><!-- /.app -->
@@ -1271,7 +1365,7 @@ var cloudSyncInFlight = false;
 var saveCloudTimer = null;
 var state = { subject:null, mode:null, sessionItems:[], answers:[], currentIndex:0, currentAnswered:false, sessionStartedAt:0, progressSubject:'PIICT', lastSummary:null, selectedPracticeCaseIndex:null, listViewType:'cuestionario' };
 var screens = {
-  home: document.getElementById('screen-home'), help: document.getElementById('screen-help'), menu: document.getElementById('screen-menu'), quiz: document.getElementById('screen-quiz'), results: document.getElementById('screen-results'), list: document.getElementById('screen-list'), weak: document.getElementById('screen-weak'), progress: document.getElementById('screen-progress')
+  home: document.getElementById('screen-home'), help: document.getElementById('screen-help'), menu: document.getElementById('screen-menu'), quiz: document.getElementById('screen-quiz'), results: document.getElementById('screen-results'), list: document.getElementById('screen-list'), weak: document.getElementById('screen-weak'), progress: document.getElementById('screen-progress'), share: document.getElementById('screen-share')
 };
 var els = {
   subjectGrid: document.getElementById('subjectGrid'), modeMenu: document.getElementById('modeMenu'), menuSubjectTitle: document.getElementById('menuSubjectTitle'), quizSubjectTitle: document.getElementById('quizSubjectTitle'), modeBadge: document.getElementById('modeBadge'), blockInfo: document.getElementById('blockInfo'), counterInfo: document.getElementById('counterInfo'), progressBar: document.getElementById('progressBar'), sectionTag: document.getElementById('sectionTag'), questionText: document.getElementById('questionText'), optionsWrap: document.getElementById('optionsWrap'), nextBtn: document.getElementById('nextBtn'), exitBtn: document.getElementById('exitBtn'), casePanel: document.getElementById('casePanel'), caseTitle: document.getElementById('caseTitle'), caseStatement: document.getElementById('caseStatement'), resultsTitle: document.getElementById('resultsTitle'), scoreCard: document.getElementById('scoreCard'), scoreNumber: document.getElementById('scoreNumber'), scoreFormulaText: document.getElementById('scoreFormulaText'), scoreReactionGif: document.getElementById('scoreReactionGif'), statCorrect: document.getElementById('statCorrect'), statWrong: document.getElementById('statWrong'), statBlank: document.getElementById('statBlank'), mistakesWrap: document.getElementById('mistakesWrap'), repeatBtn: document.getElementById('repeatBtn'), subjectBtn: document.getElementById('subjectBtn'), homeBtn: document.getElementById('homeBtn'), homeTopBtn: document.getElementById('homeTopBtn'), bankCount: document.getElementById('bankCount'), caseCount: document.getElementById('caseCount'), themeBtn: document.getElementById('themeBtn'), progressBtn: document.getElementById('progressBtn'), shareRegistryTopBtn: document.getElementById('shareRegistryTopBtn'), shareQuestionBtn: document.getElementById('shareQuestionBtn'), shareActivityBtn: document.getElementById('shareActivityBtn'), appHelpBtn: document.getElementById('appHelpBtn'), helpBackBtn: document.getElementById('helpBackBtn'), toggleInfoBtn: document.getElementById('toggleInfoBtn'), listSubjectTitle: document.getElementById('listSubjectTitle'), listQuizBtn: document.getElementById('listQuizBtn'), listPracticeBtn: document.getElementById('listPracticeBtn'), listExam1Btn: document.getElementById('listExam1Btn'), listCountInfo: document.getElementById('listCountInfo'), questionListWrap: document.getElementById('questionListWrap'), listBackBtn: document.getElementById('listBackBtn'), listHomeBtn: document.getElementById('listHomeBtn'), weakSubjectTitle: document.getElementById('weakSubjectTitle'), weakCountInfo: document.getElementById('weakCountInfo'), weakBackBtn: document.getElementById('weakBackBtn'), weakHomeBtn: document.getElementById('weakHomeBtn'), progressSubjectSwitch: document.getElementById('progressSubjectSwitch'), progressSubjectTitle: document.getElementById('progressSubjectTitle'), progressLastPlayed: document.getElementById('progressLastPlayed'), overallSessions: document.getElementById('overallSessions'), overallAccuracy: document.getElementById('overallAccuracy'), overallFailure: document.getElementById('overallFailure'), overallAnswered: document.getElementById('overallAnswered'), overallTime: document.getElementById('overallTime'), overallDays: document.getElementById('overallDays'), examStatsGrid: document.getElementById('examStatsGrid'), modeProgressGrid: document.getElementById('modeProgressGrid'), shareSubjectOptions: document.getElementById('shareSubjectOptions'), shareMetricOptions: document.getElementById('shareMetricOptions'), selectAllMetricsBtn: document.getElementById('selectAllMetricsBtn'), shareMetricsNowBtn: document.getElementById('shareMetricsNowBtn'), downloadTxtBtn: document.getElementById('downloadTxtBtn'), sharePreviewBox: document.getElementById('sharePreviewBox'), weakQuestionsList: document.getElementById('weakQuestionsList'), practicePickerPanel: document.getElementById('practicePickerPanel'), practiceRandomBtn: document.getElementById('practiceRandomBtn'), practiceBackBtn: document.getElementById('practiceBackBtn'), practiceCaseList: document.getElementById('practiceCaseList'), resetSubjectProgressBtn: document.getElementById('resetSubjectProgressBtn')
@@ -1349,7 +1443,7 @@ function buildWeakQuestionMap(sub){
 }
 function getWeakQuestionPool(data){ if(!state.subject) return []; var sub=progressStore[state.subject.short] || emptySubject(); var map=buildWeakQuestionMap(sub); var refs=[]; for(var k in map){ if(map[k] && (map[k].wrong||0)>0) refs.push(map[k]); } refs.sort(function(a,b){ return (b.wrong||0)-(a.wrong||0); }); var lookup=buildQuestionLookups(data), out=[], seen={}; for(var i=0;i<refs.length;i++){ var ref=refs[i]||{}; var exactKey=(ref.section||'')+'||'+(ref.q||''); var full=lookup.byExact[exactKey] || lookup.byQ[ref.q||'']; if(!full) continue; var cloned=cloneData(full); cloned.block='Bloque 1 — Más falladas'; var sig=questionSignature(cloned); if(seen[sig]) continue; seen[sig]=1; out.push(cloned); } return out; }
 function buildReviewOptionsHtml(item, selectedIndex, showSelectedWrong){ var html=''; if(!item || !item.options || !item.options.length) return html; for(var k=0;k<item.options.length;k++){ var cls='review-option'; var suffix=''; if(k===item.correct){ cls+=' correct'; suffix=' <strong>✓ Correcta</strong>'; } if(showSelectedWrong && typeof selectedIndex==='number' && selectedIndex===k && k!==item.correct){ cls+=' wrong'; suffix=' <strong>✗ Tu respuesta</strong>'; } html+='<div class="'+cls+'">'+escapeHtml(item.options[k])+suffix+'</div>'; } return html; }
-function showScreen(name){ for(var k in screens){ screens[k].className='screen'; } screens[name].className='screen active'; var isHome=name==='home'; els.homeTopBtn.style.display=isHome?'none':'inline-flex'; els.progressBtn.style.display='inline-flex'; els.shareRegistryTopBtn.style.display='none'; if(els.themeBtn) els.themeBtn.style.display=isHome?'inline-flex':'none'; if(els.authControls) els.authControls.style.display=isHome?'inline-flex':'none'; if(document.body){ document.body.classList.toggle('quiz-active',name==='quiz'); } }
+function showScreen(name){ for(var k in screens){ if(screens[k]) screens[k].className='screen'; } if(screens[name]) screens[name].className='screen active'; var isHome=name==='home'; els.homeTopBtn.style.display=isHome?'none':'inline-flex'; els.progressBtn.style.display=(name==='progress')?'none':'inline-flex'; els.shareRegistryTopBtn.style.display='none'; if(els.themeBtn) els.themeBtn.style.display=isHome?'inline-flex':'none'; if(els.authControls) els.authControls.style.display=isHome?'inline-flex':'none'; if(document.body){ document.body.classList.toggle('quiz-active',name==='quiz'); } }
 function getModeScoreStats(sub, mode){
   sub=sub||emptySubject();
   var modes=(sub && sub.modes && typeof sub.modes==='object') ? sub.modes : {};
@@ -1838,67 +1932,301 @@ function updateProgress(subjectShort, mode, entry){ var sub=progressStore[subjec
   for(var i=0;i<entry.items.length;i++){ var item=entry.items[i], ans=entry.answers[i], key=item.q; if(!sub.weakQuestions[key]) sub.weakQuestions[key]={q:item.q, wrong:0, correct:0, seen:0, section:item.section||'', tag:item.tag||''}; sub.weakQuestions[key].seen++; var isCorrect=!!(ans && ans.selected===item.correct); if(isCorrect){ sub.weakQuestions[key].correct++; } else if(ans && ans.selected!==item.correct){ sub.weakQuestions[key].wrong++; } sub.questionLog.unshift({q:item.q, section:item.section||'', tag:item.tag||'', isCorrect:isCorrect}); }
   if(sub.questionLog.length>2000) sub.questionLog=sub.questionLog.slice(0,2000);
   saveProgress(); }
+var progressChartMetric='nota';
+function formatTimeHuman(ms){ var mins=Math.round((ms||0)/60000); if(mins<60) return mins+' min'; var h=Math.floor(mins/60), m=mins%60; return h+'h '+(m<10?'0':'')+m+'m'; }
+function computeStreak(sub){ if(!sub||!sub.overall) return 0; var days=sub.overall.days||{}; var keys=Object.keys(days).sort(); if(!keys.length) return 0; var today=new Date(); var streak=0; for(var i=0;i<370;i++){ var d=new Date(today); d.setDate(today.getDate()-i); var k=d.toISOString().slice(0,10); if(days[k]){ streak++; } else { if(i===0){ continue; } break; } } return streak; }
+function progressRel(iso){ if(!iso) return 'nunca'; var d=new Date(iso), diff=Date.now()-d.getTime(); if(diff<60000) return 'ahora mismo'; if(diff<3600000) return 'hace '+Math.floor(diff/60000)+' min'; var now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate()); var dd=new Date(d.getFullYear(),d.getMonth(),d.getDate()); var dayDiff=Math.round((today-dd)/86400000); var hm=d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}); if(dayDiff===0) return 'hoy '+hm; if(dayDiff===1) return 'ayer '+hm; if(dayDiff<7) return 'hace '+dayDiff+' días'; return d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})+' '+hm; }
+function getExamModesForSubject(short){ return getModeKeysForSubject(short).filter(isExamMode); }
+function getScoresForExamMode(sub, mode){ var out=[]; var hist=(sub&&sub.history)||[]; for(var i=0;i<hist.length;i++){ var h=hist[i]||{}; if(h.mode===mode && typeof h.score==='number') out.push(h.score); } return out; } /* newest first */
+function renderProgressSubjectList(){
+  var el=document.getElementById('progressSubjectList'); if(!el) return;
+  var avail=getAvailableSubjects();
+  var html='<div class="subj-list-title">Asignaturas</div>';
+  for(var i=0;i<avail.length;i++){ var s=avail[i]; var act=state.progressSubject===s.short?' active':''; html+='<div class="subj-row'+act+'"><button type="button" class="subj-item" data-short="'+s.short+'">'+escapeHtml(subjectDisplayShort(s.short))+'</button><button type="button" class="subj-share" data-short="'+s.short+'" title="Compartir '+escapeHtml(subjectDisplayShort(s.short))+'" aria-label="Compartir '+escapeHtml(subjectDisplayShort(s.short))+'"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"></line></svg></button></div>'; }
+  el.innerHTML=html;
+  var btns=el.querySelectorAll('.subj-item');
+  for(var j=0;j<btns.length;j++){ (function(btn){ btn.addEventListener('click', function(){ state.progressSubject=btn.getAttribute('data-short'); renderProgress(); }); })(btns[j]); }
+  var shares=el.querySelectorAll('.subj-share');
+  for(var k=0;k<shares.length;k++){ (function(btn){ btn.addEventListener('click', function(ev){ ev.stopPropagation(); state.progressSubject=btn.getAttribute('data-short'); showScreen('share'); renderShareScreen(); }); })(shares[k]); }
+}
+function renderProgressKpi(sub){
+  var ov=sub.overall; var answered=ov.answered||0; var acc=answered?(ov.correct/answered*100):0; var fail=answered?(ov.wrong/answered*100):0;
+  var html=''
+    +'<div class="item"><span class="l">% Acierto</span><span class="v" style="color:var(--ok);">'+acc.toFixed(1)+'%</span></div>'
+    +'<div class="item"><span class="l">% Fallo</span><span class="v" style="color:var(--bad);">'+fail.toFixed(1)+'%</span></div>'
+    +'<div class="item"><span class="l">Sesiones</span><span class="v">'+(ov.sessions||0)+'</span></div>'
+    +'<div class="item"><span class="l">Preguntas</span><span class="v">'+(ov.answered||0)+'</span></div>'
+    +'<div class="item"><span class="l">Tiempo total</span><span class="v">'+formatTimeHuman(ov.totalTimeMs||0)+'</span></div>'
+    +'<div class="item"><span class="l">Días activo</span><span class="v">'+Object.keys(ov.days||{}).length+'</span></div>';
+  var el=document.getElementById('progressKpiList'); if(el) el.innerHTML=html;
+  var streak=computeStreak(sub);
+  var sv=document.getElementById('progressStreakValue'); if(sv) sv.textContent=streak+' día'+(streak===1?'':'s');
+}
+function buildSparklineSvg(points, yMin, yMax){
+  if(!points.length) return '';
+  var w=400, h=100, pad=10;
+  var n=points.length;
+  var xs=points.map(function(p,i){ return n===1?w/2:pad+(w-2*pad)*i/(n-1); });
+  var ys=points.map(function(p){ var t=(p-yMin)/(yMax-yMin||1); return h-pad-t*(h-2*pad); });
+  var pts=xs.map(function(x,i){ return x.toFixed(1)+','+ys[i].toFixed(1); }).join(' ');
+  var poly=xs.map(function(x,i){ return x.toFixed(1)+','+ys[i].toFixed(1); }).join(' ')+' '+xs[xs.length-1].toFixed(1)+','+h+' '+xs[0].toFixed(1)+','+h;
+  var last='<circle cx="'+xs[xs.length-1].toFixed(1)+'" cy="'+ys[ys.length-1].toFixed(1)+'" r="4" fill="var(--p1)"/>';
+  return '<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">'
+    +'<defs><linearGradient id="rgSparkStroke" x1="0" x2="1"><stop offset="0%" stop-color="var(--p1)"/><stop offset="100%" stop-color="var(--p3)"/></linearGradient>'
+    +'<linearGradient id="rgSparkFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="var(--p3)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--p3)" stop-opacity="0"/></linearGradient></defs>'
+    +'<polygon points="'+poly+'" fill="url(#rgSparkFill)"/>'
+    +'<polyline points="'+pts+'" fill="none" stroke="url(#rgSparkStroke)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'
+    +last+'</svg>';
+}
+function buildBarsSvg(values, yMax){
+  var w=400, h=100, pad=6;
+  var n=values.length; if(!n) return '';
+  var bw=(w-2*pad)/n;
+  var inner=bw*0.7, gap=(bw-inner)/2;
+  var out='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><defs><linearGradient id="rgBar" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="var(--p1)"/><stop offset="100%" stop-color="var(--p3)"/></linearGradient></defs>';
+  for(var i=0;i<n;i++){ var v=values[i]; var bh=(v/(yMax||1))*(h-2*pad); var x=pad+i*bw+gap; var y=h-pad-bh; if(bh<=0){ out+='<rect x="'+x.toFixed(1)+'" y="'+(h-pad-1).toFixed(1)+'" width="'+inner.toFixed(1)+'" height="1" fill="var(--line-2)"/>'; } else { out+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+inner.toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="2" fill="url(#rgBar)"/>'; } }
+  out+='</svg>';
+  return out;
+}
+function renderProgressSparkline(sub){
+  var el=document.getElementById('progressSparkline'); if(!el) return;
+  var metric=progressChartMetric;
+  var hist=(sub&&sub.history)||[];
+  if(metric==='nota'){
+    var scores=[]; for(var i=hist.length-1;i>=0;i--){ var h=hist[i]||{}; if(typeof h.score==='number' && isExamMode(h.mode)) scores.push(h.score); }
+    scores=scores.slice(-15);
+    if(!scores.length){ el.innerHTML='<div class="empty-msg">Sin notas de examen todavía</div>'; return; }
+    var best=Math.max.apply(null, scores);
+    el.innerHTML='<span class="yaxis">10</span><span class="axis-max">mejor '+best.toFixed(1)+'</span><span class="axis-min">0</span>'+buildSparklineSvg(scores, 0, 10);
+  } else if(metric==='acierto'){
+    var pcts=[]; for(var j=hist.length-1;j>=0;j--){ var hh=hist[j]||{}; if(typeof hh.percent==='number') pcts.push(hh.percent); }
+    pcts=pcts.slice(-15);
+    if(!pcts.length){ el.innerHTML='<div class="empty-msg">Sin sesiones registradas</div>'; return; }
+    var bestP=Math.max.apply(null, pcts);
+    el.innerHTML='<span class="yaxis">100%</span><span class="axis-max">mejor '+bestP.toFixed(0)+'%</span><span class="axis-min">0%</span>'+buildSparklineSvg(pcts, 0, 100);
+  } else {
+    var buckets={}; var today=new Date(); var yAll=[];
+    for(var d=13;d>=0;d--){ var dt=new Date(today); dt.setDate(today.getDate()-d); var k=dt.toISOString().slice(0,10); buckets[k]=0; }
+    for(var m=0;m<hist.length;m++){ var e=hist[m]||{}; var kk=(e.finishedAt||'').slice(0,10); if(kk && buckets.hasOwnProperty(kk)) buckets[kk]++; }
+    var keys=Object.keys(buckets); var vals=keys.map(function(k){ return buckets[k]; });
+    var totalSessions=vals.reduce(function(a,b){return a+b;},0);
+    if(!totalSessions){ el.innerHTML='<div class="empty-msg">Sin actividad en los últimos 14 días</div>'; return; }
+    var mx=Math.max.apply(null, vals)||1;
+    el.innerHTML='<span class="yaxis">'+mx+'</span><span class="axis-max">'+totalSessions+' sesiones</span><span class="axis-min">0</span>'+buildBarsSvg(vals, mx);
+  }
+}
+function renderProgressExamTable(sub, short){
+  var body=document.getElementById('progressExamTableBody'); if(!body) return;
+  var modes=getExamModesForSubject(short);
+  var html=''; var any=false;
+  for(var i=0;i<modes.length;i++){
+    var mk=modes[i]; var meta=getExamModeMeta(mk); var stats=getModeScoreStats(sub, mk); var scores=getScoresForExamMode(sub, mk); // newest first
+    var label=meta.title;
+    if(stats.sessions>0){
+      any=true;
+      var last3=scores.slice(0,3).reverse(); // oldest-first for display, newest on right
+      var lastHtml=last3.map(function(s){ return '<span class="nota">'+s.toFixed(1)+'</span>'; }).join('');
+      html+='<tr><td class="tipo">'+escapeHtml(label)+'</td><td class="intentos">'+stats.sessions+'</td><td class="best">'+(typeof stats.bestScore==='number'?stats.bestScore.toFixed(1):'-')+'</td><td class="avg">'+(typeof stats.avgScore==='number'?stats.avgScore.toFixed(1):'-')+'</td><td class="ultimas">'+(lastHtml||'-')+'</td></tr>';
+    } else {
+      html+='<tr><td class="tipo">'+escapeHtml(label)+'</td><td colspan="4" class="empty">Sin intentos aún</td></tr>';
+    }
+  }
+  if(!modes.length){ html='<tr><td colspan="5" class="empty">Esta asignatura no tiene exámenes.</td></tr>'; }
+  body.innerHTML=html;
+}
+function renderProgressFreeStudy(sub, short){
+  var el=document.getElementById('progressFreeStudy'); if(!el) return;
+  var modeKeys=getModeKeysForSubject(short).filter(function(m){ return m==='cuestionario' || m==='practicas'; });
+  if(!modeKeys.length){ el.innerHTML='<div class="subtle">Sin modos de estudio libre en esta asignatura.</div>'; return; }
+  var html='';
+  for(var i=0;i<modeKeys.length;i++){
+    var k=modeKeys[i]; var m=(sub.modes&&sub.modes[k])||emptyMode();
+    var a=m.answered?(m.correct/m.answered*100):0;
+    html+='<div class="mode-row"><span class="l">'+escapeHtml(MODES[k].title)+'</span><span class="stats">'+(m.sessions||0)+' sesiones · '+a.toFixed(0)+'% acierto · '+(m.answered||0)+' preguntas</span></div>';
+  }
+  el.innerHTML=html;
+}
+function progressModePillLabel(mode){ var meta=(isExamMode(mode))?getExamModeMeta(mode):null; if(meta) return meta.title; if(mode==='cuestionario') return 'Cuestionario'; if(mode==='practicas') return 'Prácticas'; return mode||'—'; }
+function renderProgressLastSessions(sub){
+  var el=document.getElementById('progressLastSessions'); if(!el) return;
+  var hist=(sub.history||[]).slice(0,8);
+  if(!hist.length){ el.innerHTML='<div class="subtle" style="padding:10px;">No hay sesiones registradas todavía.</div>'; return; }
+  var html='';
+  for(var i=0;i<hist.length;i++){
+    var h=hist[i]||{}; var pill=progressModePillLabel(h.mode);
+    var answered=(h.correct||0)+(h.wrong||0);
+    var mid='';
+    if(isExamMode(h.mode) && typeof h.score==='number'){
+      mid='Nota '+h.score.toFixed(1)+' · '+(h.correct||0)+'/'+(h.total||answered)+' aciertos';
+    } else {
+      var pct=(typeof h.percent==='number')?h.percent:(answered?(h.correct/answered*100):0);
+      mid=(h.correct||0)+'/'+(h.total||answered)+' aciertos ('+pct.toFixed(0)+'%)';
+    }
+    html+='<div class="sess-row"><span class="mode-pill">'+escapeHtml(pill)+'</span><span class="stats-mid">'+mid+'</span><span class="when">'+escapeHtml(progressRel(h.finishedAt))+'</span></div>';
+  }
+  el.innerHTML=html;
+}
 function renderProgress(){
   var avail=getAvailableSubjects();
   if(!state.progressSubject || !SUBJECT_DATA[state.progressSubject]){
     state.progressSubject=(state.subject && state.subject.short) ? state.subject.short : (avail[0] ? avail[0].short : 'PIICT');
   }
   showScreen('progress');
-  renderProgressSwitch();
-  renderMetricShareUI();
   var short=state.progressSubject;
   if(!progressStore[short]) progressStore[short]=emptySubject();
   var sub=progressStore[short];
   var ov=sub.overall;
-  var answered=ov.answered;
-  var accuracy=answered?Math.round((ov.correct/answered)*1000)/10:0;
-  var failure=answered?Math.round((ov.wrong/answered)*1000)/10:0;
-  els.progressSubjectTitle.textContent='Asignatura: '+subjectDisplayByShort(short);
-  els.progressLastPlayed.textContent='Última actividad: '+(ov.lastPlayed?new Date(ov.lastPlayed).toLocaleString('es-ES'):'Sin actividad');
-  els.overallSessions.textContent=String(ov.sessions);
-  els.overallAccuracy.textContent=accuracy.toFixed(1)+'%';
-  els.overallFailure.textContent=failure.toFixed(1)+'%';
-  els.overallAnswered.textContent=String(ov.answered);
-  els.overallTime.textContent=Math.round(ov.totalTimeMs/60000)+' min';
-  els.overallDays.textContent=String(Object.keys(ov.days).length);
-  els.examStatsGrid.innerHTML='';
-  var examModeKeys=getModeKeysForSubject(short).filter(isExamMode);
-  for(var e=0;e<examModeKeys.length;e++){
-    var examKey=examModeKeys[e], examStats=getModeScoreStats(sub, examKey), meta=getExamModeMeta(examKey);
-    var examCard=document.createElement('div');
-    examCard.className='stat-card';
-    examCard.innerHTML='<div>'+meta.title+'</div><div class="small" style="margin-top:6px;">Intentos: '+examStats.sessions+'</div><div class="exam-score-line"><span>Mejor nota</span>'+renderInlineScore(examStats.bestScore)+'</div><div class="exam-score-line"><span>Nota media</span>'+renderInlineScore(examStats.avgScore)+'</div><div class="exam-score-line"><span>Última nota</span>'+renderInlineScore(examStats.lastScore)+'</div>';
-    els.examStatsGrid.appendChild(examCard);
-  }
-  els.modeProgressGrid.innerHTML='';
-  var modeKeys=getModeKeysForSubject(short);
-  for(var i=0;i<modeKeys.length;i++){
-    var key=modeKeys[i], m=sub.modes[key] || emptyMode();
-    var a=m.answered?Math.round((m.correct/m.answered)*1000)/10:0, f=m.answered?Math.round((m.wrong/m.answered)*1000)/10:0;
-    var bestHtml='-';
-    if(isExamMode(key) && typeof m.bestScore==='number') bestHtml='<span class="'+getExamTone(m.bestScore)+'">'+m.bestScore.toFixed(2)+'</span>';
-    var div=document.createElement('div');
-    div.className='stat-card';
-    div.innerHTML='<strong>'+MODES[key].title+'</strong><div class="small" style="margin-top:8px;">Intentos: '+m.sessions+'<br>Acierto: '+a.toFixed(1)+'%<br>Fallo: '+f.toFixed(1)+'%<br>Preguntas: '+m.answered+'<br>Tiempo: '+Math.round(m.totalTimeMs/60000)+' min'+(isExamMode(key)?'<br>Mejor nota: '+bestHtml:'')+'</div>';
-    els.modeProgressGrid.appendChild(div);
-  }
-  updateSharePreview();
+  if(els.progressLastPlayed){ els.progressLastPlayed.textContent=subjectDisplayByShort(short)+' · última actividad: '+(ov.lastPlayed?progressRel(ov.lastPlayed):'sin actividad'); }
+  renderProgressSubjectList();
+  renderProgressKpi(sub);
+  renderProgressSparkline(sub);
+  renderProgressExamTable(sub, short);
+  renderProgressFreeStudy(sub, short);
+  renderProgressLastSessions(sub);
+  // keep legacy hidden nodes harmlessly updated
+  var ls=document.getElementById('overallSessions'); if(ls) ls.textContent=String(ov.sessions||0);
+}
+function bindProgressChartChips(){
+  var wrap=document.getElementById('progressChartChips'); if(!wrap || wrap.__bound) return; wrap.__bound=1;
+  wrap.addEventListener('click', function(ev){ var b=ev.target.closest('.r-chip'); if(!b) return; var m=b.getAttribute('data-metric'); if(!m) return; progressChartMetric=m; var chips=wrap.querySelectorAll('.r-chip'); for(var i=0;i<chips.length;i++) chips[i].classList.toggle('active', chips[i]===b); var short=state.progressSubject; if(short && progressStore[short]) renderProgressSparkline(progressStore[short]); });
 }
 function renderWeak(sub){ els.weakQuestionsList.innerHTML=''; var map=buildWeakQuestionMap(sub||emptySubject()); var arr=[]; for(var k in map){ if(map[k] && (map[k].wrong||0)>0) arr.push(map[k]); } arr.sort(function(a,b){ return (b.wrong||0)-(a.wrong||0); }); if(!arr.length){ els.weakQuestionsList.innerHTML='<div class="empty">Aún no hay preguntas falladas registradas.</div>'; return 0; } var data=currentData()||{}; var lookup=buildQuestionLookups(data); for(var i=0;i<Math.min(10,arr.length);i++){ var it=arr[i], row=document.createElement('div'); row.className='weak-item'; var exactKey=(it.section||'')+'||'+(it.q||''); var full=lookup.byExact[exactKey] || lookup.byQ[it.q||''] || it; var html='<strong>'+escapeHtml(it.q)+'</strong><div class="small" style="margin-top:6px;">'+it.wrong+' fallos · '+escapeHtml(it.section||'')+(it.tag?' · '+escapeHtml(it.tag):'')+'</div>'; html+=buildReviewOptionsHtml(full, null, false); row.innerHTML=html; els.weakQuestionsList.appendChild(row); } return arr.length; }
 function renderWeakScreen(){ if(!state.subject) return; var short=state.subject.short; var sub=progressStore[short] || emptySubject(); progressStore[short]=sub; els.weakSubjectTitle.textContent=subjectDisplayName(state.subject); var totalWeak=renderWeak(sub); els.weakCountInfo.textContent=totalWeak ? ('Mostrando '+Math.min(10,totalWeak)+' preguntas con más fallos.') : 'Aún no hay preguntas falladas registradas en esta asignatura.'; showScreen('weak'); }
-function renderProgressSwitch(){ els.progressSubjectSwitch.innerHTML=''; var avail=getAvailableSubjects(); for(var i=0;i<avail.length;i++){ var s=avail[i], b=document.createElement('button'); b.className='btn small'+(state.progressSubject===s.short?' active':''); b.textContent=subjectDisplayShort(s.short); (function(short){ b.addEventListener('click', function(){ state.progressSubject=short; renderProgress(); }); })(s.short); els.progressSubjectSwitch.appendChild(b); } }
+function renderProgressSwitch(){ /* legacy no-op (new UI uses renderProgressSubjectList) */ }
 function getAvailableSubjects(){ var out=[]; for(var i=0;i<SUBJECTS.length;i++){ if(SUBJECTS[i].available) out.push(SUBJECTS[i]); } return out; }
-function renderMetricShareUI(){ var short=state.progressSubject; els.shareSubjectOptions.innerHTML=''; var avail=getAvailableSubjects(); for(var i=0;i<avail.length;i++){ var s=avail[i], b=document.createElement('button'); b.className='btn small'+(short===s.short?' active':''); b.textContent=subjectDisplayShort(s.short); (function(subjectShort){ b.addEventListener('click', function(){ state.progressSubject=subjectShort; renderProgress(); }); })(s.short); els.shareSubjectOptions.appendChild(b); }
-  els.shareMetricOptions.innerHTML=''; for(var j=0;j<METRIC_DEFS.length;j++){ var def=METRIC_DEFS[j], card=document.createElement('label'); card.className='checkbox-card'; card.innerHTML='<input type="checkbox" name="metricShare" value="'+def.key+'"'+(j<4?' checked':'')+'> '+def.label; els.shareMetricOptions.appendChild(card); }
-  bindMetricCheckboxes(); updateSharePreview(); }
-function bindMetricCheckboxes(){ var boxes=document.getElementsByName('metricShare'); for(var i=0;i<boxes.length;i++){ boxes[i].addEventListener('change', updateSharePreview); } }
+function renderMetricShareUI(){ /* legacy no-op */ }
+function bindMetricCheckboxes(){ /* legacy no-op */ }
 function selectedMetricKeys(){ var out=[], boxes=document.getElementsByName('metricShare'); for(var i=0;i<boxes.length;i++){ if(boxes[i].checked) out.push(boxes[i].value); } return out; }
 function formatMetricsText(subjectShort, keys, full){ var sub=progressStore[subjectShort]||emptySubject(); var ov=sub.overall; var answered=ov.answered; var acc=answered?(ov.correct/answered*100):0; var fail=answered?(ov.wrong/answered*100):0; var examen=getModeScoreStats(sub,'examen'); var examen1=getModeScoreStats(sub,'examen1'); var examenTotal=getModeScoreStats(sub,'examenTotal'); var lines=[]; lines.push('Asignatura: '+subjectShort); if(full) lines.push('');
   var map={ sessions:'Sesiones: '+ov.sessions, accuracy:'% de acierto: '+acc.toFixed(1)+'%', failure:'% de fallo: '+fail.toFixed(1)+'%', answered:'Preguntas respondidas: '+ov.answered, time:'Tiempo total: '+Math.round(ov.totalTimeMs/60000)+' min', days:'Días de estudio: '+Object.keys(ov.days).length, examBestExamen:'Examen · Mejor nota: '+(typeof examen.bestScore==='number'?examen.bestScore.toFixed(2):'-'), examAvgExamen:'Examen · Nota media: '+(typeof examen.avgScore==='number'?examen.avgScore.toFixed(2):'-'), examLastExamen:'Examen · Última nota: '+(typeof examen.lastScore==='number'?examen.lastScore.toFixed(2):'-'), examBestExamen1:'Examen 1 · Mejor nota: '+(typeof examen1.bestScore==='number'?examen1.bestScore.toFixed(2):'-'), examAvgExamen1:'Examen 1 · Nota media: '+(typeof examen1.avgScore==='number'?examen1.avgScore.toFixed(2):'-'), examLastExamen1:'Examen 1 · Última nota: '+(typeof examen1.lastScore==='number'?examen1.lastScore.toFixed(2):'-'), examBestExamenTotal:'Examen total · Mejor nota: '+(typeof examenTotal.bestScore==='number'?examenTotal.bestScore.toFixed(2):'-'), examAvgExamenTotal:'Examen total · Nota media: '+(typeof examenTotal.avgScore==='number'?examenTotal.avgScore.toFixed(2):'-'), examLastExamenTotal:'Examen total · Última nota: '+(typeof examenTotal.lastScore==='number'?examenTotal.lastScore.toFixed(2):'-') };
   for(var i=0;i<keys.length;i++){ if(map[keys[i]]) lines.push(map[keys[i]]); }
   if(full){ lines.push(''); lines.push('Por secciones:'); var keys2=getModeKeysForSubject(subjectShort); for(var j=0;j<keys2.length;j++){ var mk=keys2[j], m=sub.modes[mk] || emptyMode(), a=m.answered?(m.correct/m.answered*100):0; lines.push('- '+MODES[mk].title+': '+m.sessions+' intentos · '+a.toFixed(1)+'% acierto'); } }
   return lines.join('\n'); }
-function updateSharePreview(){ els.sharePreviewBox.value=formatMetricsText(state.progressSubject, selectedMetricKeys(), false); }
+
+/* ========== NEW SHARE SCREEN ========== */
+var SHARE_METRIC_GROUPS=[
+  {title:'Globales', items:[
+    {key:'g_sessions', label:'Sesiones totales', def:true},
+    {key:'g_accfail', label:'% Acierto / Fallo', def:true},
+    {key:'g_answered', label:'Preguntas respondidas', def:true},
+    {key:'g_time', label:'Tiempo total', def:true},
+    {key:'g_days', label:'Días activo', def:false},
+    {key:'g_streak', label:'Racha actual', def:false}
+  ]},
+  {title:'Estudio libre', items:[
+    {key:'f_cuestionario', label:'Cuestionario (sesiones · acierto)', def:true},
+    {key:'f_practicas', label:'Prácticas (sesiones · acierto)', def:true}
+  ]},
+  {title:'Exámenes — notas', items:[
+    {key:'en_examen1', label:'Examen 1 (todas las notas)', def:true},
+    {key:'en_examen', label:'Examen completo', def:false},
+    {key:'en_examenTotal', label:'Examen Total', def:false},
+    {key:'en_examenPersonalizado', label:'Examen Personalizado', def:true}
+  ]},
+  {title:'Resúmenes de examen', items:[
+    {key:'es_best', label:'Mejor nota', def:true},
+    {key:'es_avg', label:'Nota media', def:false},
+    {key:'es_last', label:'Última nota', def:false},
+    {key:'es_evo5', label:'Evolución (últimas 5)', def:false}
+  ]},
+  {title:'Histórico', items:[
+    {key:'h_last10', label:'Últimas 10 sesiones (fecha · modo · nota)', def:false}
+  ]}
+];
+function renderShareSubjectChips(){
+  var el=document.getElementById('shareSubjectChips'); if(!el) return;
+  var avail=getAvailableSubjects(); var html='';
+  for(var i=0;i<avail.length;i++){ var s=avail[i]; html+='<button type="button" class="share-chip'+(state.progressSubject===s.short?' active':'')+'" data-short="'+s.short+'">'+escapeHtml(subjectDisplayShort(s.short))+'</button>'; }
+  el.innerHTML=html;
+  var btns=el.querySelectorAll('.share-chip');
+  for(var j=0;j<btns.length;j++){ (function(btn){ btn.addEventListener('click', function(){ state.progressSubject=btn.getAttribute('data-short'); renderShareScreen(); }); })(btns[j]); }
+}
+function renderShareMetricGroups(){
+  var wrap=document.getElementById('shareMetricGroups'); if(!wrap) return;
+  // Preserve existing checked state on re-render
+  var prev={}; var existing=wrap.querySelectorAll('input[type=checkbox][data-share-key]'); for(var i=0;i<existing.length;i++){ prev[existing[i].getAttribute('data-share-key')]=existing[i].checked; }
+  var first=!existing.length;
+  var html='';
+  for(var g=0;g<SHARE_METRIC_GROUPS.length;g++){
+    var grp=SHARE_METRIC_GROUPS[g];
+    html+='<div class="cbox-group"><div class="g-title">'+escapeHtml(grp.title)+'</div><div class="cbox-grid">';
+    for(var k=0;k<grp.items.length;k++){ var it=grp.items[k]; var checked=first?it.def:!!prev[it.key]; html+='<label class="cbox"><input type="checkbox" data-share-key="'+it.key+'"'+(checked?' checked':'')+'> '+escapeHtml(it.label)+'</label>'; }
+    html+='</div></div>';
+  }
+  wrap.innerHTML=html;
+  var boxes=wrap.querySelectorAll('input[type=checkbox][data-share-key]');
+  for(var b=0;b<boxes.length;b++){ boxes[b].addEventListener('change', updateSharePreview); }
+}
+function getSelectedShareKeys(){ var out={}; var boxes=document.querySelectorAll('#shareMetricGroups input[type=checkbox][data-share-key]'); for(var i=0;i<boxes.length;i++){ if(boxes[i].checked) out[boxes[i].getAttribute('data-share-key')]=1; } return out; }
+function buildDetailedMetricsText(short, sel){
+  var sub=progressStore[short]||emptySubject(); var ov=sub.overall;
+  var answered=ov.answered||0; var acc=answered?(ov.correct/answered*100):0; var fail=answered?(ov.wrong/answered*100):0;
+  var lines=[];
+  lines.push('📊 Registro '+subjectDisplayShort(short));
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━');
+  // Globales
+  var gLines=[];
+  if(sel.g_sessions) gLines.push('  📝 Sesiones: '+(ov.sessions||0));
+  if(sel.g_accfail) gLines.push('  ✅ Acierto / Fallo: '+acc.toFixed(1)+'% / '+fail.toFixed(1)+'%');
+  if(sel.g_answered) gLines.push('  🔢 Preguntas: '+(ov.answered||0));
+  if(sel.g_time) gLines.push('  ⏱  Tiempo total: '+formatTimeHuman(ov.totalTimeMs||0));
+  if(sel.g_days) gLines.push('  📅 Días activo: '+Object.keys(ov.days||{}).length);
+  if(sel.g_streak) gLines.push('  🔥 Racha actual: '+computeStreak(sub)+' días');
+  if(gLines.length){ lines.push(''); lines.push('📈 General'); lines.push(gLines.join('\n')); }
+  // Estudio libre
+  var fLines=[];
+  if(sel.f_cuestionario){ var mc=(sub.modes&&sub.modes.cuestionario)||emptyMode(); var ac=mc.answered?(mc.correct/mc.answered*100):0; fLines.push('  · Cuestionario: '+(mc.sessions||0)+' sesiones · '+ac.toFixed(0)+'% acierto'); }
+  if(sel.f_practicas){ var mp=(sub.modes&&sub.modes.practicas)||emptyMode(); var ap=mp.answered?(mp.correct/mp.answered*100):0; fLines.push('  · Prácticas: '+(mp.sessions||0)+' sesiones · '+ap.toFixed(0)+'% acierto'); }
+  if(fLines.length){ lines.push(''); lines.push('📚 Estudio libre'); lines.push(fLines.join('\n')); }
+  // Exámenes - notas (por modo seleccionado)
+  var examModeMap={en_examen1:'examen1', en_examen:'examen', en_examenTotal:'examenTotal', en_examenPersonalizado:'examenPersonalizado'};
+  for(var ek in examModeMap){ if(!sel[ek]) continue; var mode=examModeMap[ek]; var availModes=getModeKeysForSubject(short); if(availModes.indexOf(mode)===-1) continue; var scores=getScoresForExamMode(sub, mode); var st=getModeScoreStats(sub, mode); var meta=getExamModeMeta(mode); if(!scores.length && !st.sessions){ lines.push(''); lines.push('🎯 '+meta.title+' (sin intentos)'); continue; }
+    lines.push('');
+    lines.push('🎯 '+meta.title+' ('+(st.sessions||0)+' intentos)');
+    if(scores.length){ var oldFirst=scores.slice().reverse(); var notes=oldFirst.map(function(s){ return s.toFixed(1); }).join(' · '); lines.push('  · Notas: '+notes); }
+    var summaryParts=[];
+    if(sel.es_best && typeof st.bestScore==='number') summaryParts.push('Mejor: '+st.bestScore.toFixed(1));
+    if(sel.es_avg && typeof st.avgScore==='number') summaryParts.push('Media: '+st.avgScore.toFixed(1));
+    if(sel.es_last && typeof st.lastScore==='number') summaryParts.push('Última: '+st.lastScore.toFixed(1));
+    if(sel.es_evo5){ var evo=scores.slice(0,5).reverse(); if(evo.length) summaryParts.push('Evolución: '+evo.map(function(s){return s.toFixed(1);}).join(' → ')); }
+    if(summaryParts.length) lines.push('  · '+summaryParts.join(' · '));
+  }
+  // If user selected summaries but no specific exam-modes, add an overall summary over all exam modes.
+  var anyExamModeSel=Object.keys(examModeMap).some(function(k){ return sel[k]; });
+  var anySummarySel=sel.es_best||sel.es_avg||sel.es_last||sel.es_evo5;
+  if(!anyExamModeSel && anySummarySel){
+    var combined=getCombinedExamStats(sub);
+    lines.push('');
+    lines.push('🎯 Exámenes (todos)');
+    var sp=[];
+    if(sel.es_best && typeof combined.bestScore==='number') sp.push('Mejor: '+combined.bestScore.toFixed(1));
+    var avg=combined.sessions?combined.totalScore/combined.sessions:null;
+    if(sel.es_avg && typeof avg==='number') sp.push('Media: '+avg.toFixed(1));
+    if(sel.es_last && typeof combined.lastScore==='number') sp.push('Última: '+combined.lastScore.toFixed(1));
+    if(sp.length) lines.push('  · '+sp.join(' · '));
+  }
+  // Histórico últimas 10
+  if(sel.h_last10){
+    var hist=(sub.history||[]).slice(0,10);
+    if(hist.length){
+      lines.push('');
+      lines.push('🕐 Últimas '+hist.length+' sesiones');
+      for(var hi=0;hi<hist.length;hi++){ var h=hist[hi]||{}; var pill=progressModePillLabel(h.mode); var when=progressRel(h.finishedAt); var sc=(isExamMode(h.mode) && typeof h.score==='number')?(' · Nota '+h.score.toFixed(1)):''; var pct=(typeof h.percent==='number')?(' · '+h.percent.toFixed(0)+'%'):''; lines.push('  · '+when+' — '+pill+sc+pct); }
+    }
+  }
+  return lines.join('\n');
+}
+function updateSharePreview(){
+  var el=document.getElementById('sharePreviewBox'); if(!el) return;
+  var short=state.progressSubject; var sel=getSelectedShareKeys();
+  var text=buildDetailedMetricsText(short, sel);
+  if(el.tagName==='PRE' || el.tagName==='DIV'){ el.textContent=text; } else { el.value=text; }
+}
+function renderShareScreen(){
+  renderShareSubjectChips();
+  renderShareMetricGroups();
+  updateSharePreview();
+}
 function getStudentName(forceAsk){ var name=''; try{ name=localStorage.getItem(NAME_KEY)||''; }catch(e){} if(forceAsk || !name){ name=window.prompt('Escribe tu nombre para compartir:', name||''); if(name){ try{ localStorage.setItem(NAME_KEY, name); }catch(e2){} } }
   return name||''; }
 function shareText(text){ if(navigator.share){ navigator.share({text:text, title:'Repaso TSEI'}).catch(function(){}); return; }
@@ -1975,14 +2303,14 @@ function updateExamCountdown(){
   var hoursEl=document.getElementById('examCountdownHours');
   var minutesEl=document.getElementById('examCountdownMinutes');
   var statusEl=document.getElementById('examCountdownStatus');
-  if(!wrap || !daysEl || !hoursEl || !minutesEl || !statusEl) return;
+  if(!wrap || !daysEl || !hoursEl || !minutesEl) return;
 
   var diff=getExamCountdownTarget().getTime()-Date.now();
   if(diff<=0){
     daysEl.textContent='0';
     hoursEl.textContent='00';
     minutesEl.textContent='00';
-    statusEl.textContent='Los exámenes ya han empezado. Mucha mierda 🍀';
+    if(statusEl) statusEl.textContent='Los exámenes ya han empezado. Mucha mierda 🍀';
     wrap.classList.add('is-live');
     return;
   }
@@ -1996,7 +2324,7 @@ function updateExamCountdown(){
   daysEl.textContent=String(days);
   hoursEl.textContent=String(hours).padStart(2,'0');
   minutesEl.textContent=String(minutes).padStart(2,'0');
-  statusEl.textContent='Faltan '+days+' día'+(days===1?'':'s')+', '+hours+' hora'+(hours===1?'':'s')+' y '+minutes+' minuto'+(minutes===1?'':'s')+'.';
+  if(statusEl) statusEl.textContent='Faltan '+days+' día'+(days===1?'':'s')+', '+hours+' hora'+(hours===1?'':'s')+' y '+minutes+' minuto'+(minutes===1?'':'s')+'.';
 }
 function initExamCountdown(){
   updateExamCountdown();
@@ -2006,16 +2334,19 @@ function initExamCountdown(){
 
 function init(){ createAuthUi(); updateAuthUi(); setupFirebase(); applySavedTheme(); renderSubjects(); initExamCountdown();
   var brandHome=document.getElementById('brandHome'); if(brandHome){ brandHome.addEventListener('click', function(){ resetHome(); }); }
-  els.progressBtn.addEventListener('click', function(){ if(!state.progressSubject){ state.progressSubject=(state.subject && state.subject.short) ? state.subject.short : (getAvailableSubjects()[0] ? getAvailableSubjects()[0].short : 'PIICT'); } renderProgress(); });
+  els.progressBtn.addEventListener('click', function(){ if(state.subject && state.subject.short){ state.progressSubject=state.subject.short; } else if(!state.progressSubject){ state.progressSubject=(getAvailableSubjects()[0] ? getAvailableSubjects()[0].short : 'PIICT'); } renderProgress(); });
   if(els.authActionBtn) els.authActionBtn.addEventListener('click', function(){ if(state.authUser) signOutGoogle(); else signInWithGoogle(); });
   els.listQuizBtn.addEventListener('click', function(){ renderQuestionListScreen('cuestionario'); }); els.listPracticeBtn.addEventListener('click', function(){ renderQuestionListScreen('practicas'); }); if(els.listExam1Btn){ els.listExam1Btn.addEventListener('click', function(){ renderQuestionListScreen('examen1'); }); } els.listBackBtn.addEventListener('click', backSubject); els.listHomeBtn.addEventListener('click', resetHome); if(els.weakBackBtn) els.weakBackBtn.addEventListener('click', backSubject); if(els.weakHomeBtn) els.weakHomeBtn.addEventListener('click', resetHome);
   els.practiceRandomBtn.addEventListener('click', function(){ startPracticeCase(null); }); els.practiceBackBtn.addEventListener('click', hidePracticePicker);
-  if(els.resetSubjectProgressBtn) els.resetSubjectProgressBtn.addEventListener('click', function(){ if(state.subject) resetSubjectProgress(state.subject.short); });
+  var _resetBtn=document.getElementById('resetSubjectProgressBtn'); if(_resetBtn) _resetBtn.addEventListener('click', function(){ var short=state.progressSubject || (state.subject&&state.subject.short); if(!short) return; if(window.confirm('¿Seguro que quieres borrar todo el registro de '+subjectDisplayByShort(short)+'? Esta acción no se puede deshacer.')) resetSubjectProgress(short); });
   els.homeTopBtn.addEventListener('click', resetHome); els.homeBtn.addEventListener('click', resetHome); els.subjectBtn.addEventListener('click', backSubject); els.repeatBtn.addEventListener('click', function(){ startMode(state.mode); }); els.nextBtn.addEventListener('click', nextQuestion); els.exitBtn.addEventListener('click', function(){ if(window.confirm('¿Salir de la sesión? Perderás el progreso actual.')) resetHome(); }); els.themeBtn.addEventListener('click', toggleTheme); els.shareQuestionBtn.addEventListener('click', function(){ var txt=buildQuestionShareText(); if(txt) shareText(txt); }); els.shareActivityBtn.addEventListener('click', function(){ var txt=buildActivityShareText(); if(txt) shareText(txt); }); els.appHelpBtn.addEventListener('click', function(){ showScreen('help'); }); els.helpBackBtn.addEventListener('click', resetHome); els.toggleInfoBtn.addEventListener('click', function(){ els.sectionTag.style.display = els.sectionTag.style.display==='none' ? 'block' : 'none'; });
-  els.shareRegistryTopBtn.addEventListener('click', function(){ var pieces=[]; var avail=getAvailableSubjects(); var metricKeys=[]; for(var mk=0;mk<METRIC_DEFS.length;mk++) metricKeys.push(METRIC_DEFS[mk].key); for(var i=0;i<avail.length;i++){ pieces.push(formatMetricsText(avail[i].short, metricKeys, true)); pieces.push(''); } shareText(pieces.join('\n')); });
-  els.selectAllMetricsBtn.addEventListener('click', function(){ var boxes=document.getElementsByName('metricShare'); for(var i=0;i<boxes.length;i++){ boxes[i].checked=true; } updateSharePreview(); });
-  els.shareMetricsNowBtn.addEventListener('click', function(){ shareText(formatMetricsText(state.progressSubject, selectedMetricKeys(), false)); });
-  els.downloadTxtBtn.addEventListener('click', function(){ downloadText('registro_'+state.progressSubject+'.txt', formatMetricsText(state.progressSubject, selectedMetricKeys(), false)); });
+  els.shareRegistryTopBtn.addEventListener('click', function(){ if(!state.progressSubject){ state.progressSubject=(state.subject && state.subject.short) ? state.subject.short : (getAvailableSubjects()[0] ? getAvailableSubjects()[0].short : 'PIICT'); } showScreen('share'); renderShareScreen(); });
+  bindProgressChartChips();
+  var _shareBack=document.getElementById('shareBackBtn'); if(_shareBack) _shareBack.addEventListener('click', function(){ renderProgress(); });
+  var _selAll=document.getElementById('selectAllMetricsBtn'); if(_selAll) _selAll.addEventListener('click', function(){ var boxes=document.querySelectorAll('#shareMetricGroups input[type=checkbox][data-share-key]'); for(var i=0;i<boxes.length;i++) boxes[i].checked=true; updateSharePreview(); });
+  var _deselAll=document.getElementById('deselectAllMetricsBtn'); if(_deselAll) _deselAll.addEventListener('click', function(){ var boxes=document.querySelectorAll('#shareMetricGroups input[type=checkbox][data-share-key]'); for(var i=0;i<boxes.length;i++) boxes[i].checked=false; updateSharePreview(); });
+  var _shareNow=document.getElementById('shareMetricsNowBtn'); if(_shareNow) _shareNow.addEventListener('click', function(){ shareText(buildDetailedMetricsText(state.progressSubject, getSelectedShareKeys())); });
+  var _dl=document.getElementById('downloadTxtBtn'); if(_dl) _dl.addEventListener('click', function(){ downloadText('registro_'+state.progressSubject+'.txt', buildDetailedMetricsText(state.progressSubject, getSelectedShareKeys())); });
   showScreen('home');
 }
 
@@ -2563,6 +2894,97 @@ init();
   ].join('');
   document.head.appendChild(adminVisualStyle);
 
+  /* ── OPTION A — Clean dashboard styles ── */
+  var adminOptAStyle=document.createElement('style');
+  adminOptAStyle.textContent=[
+    '.a-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}',
+    '@media (max-width:700px){.a-kpis{grid-template-columns:1fr 1fr;}}',
+    '.a-kpi{background:var(--card,#fff);border:1px solid var(--line);border-radius:16px;padding:16px 18px;}',
+    '.a-kpi .l{font-size:11px;font-weight:700;color:color-mix(in oklab,var(--ink,#1a1530) 55%,transparent);text-transform:uppercase;letter-spacing:.08em;}',
+    '.a-kpi .v{font-size:32px;font-weight:800;margin-top:4px;line-height:1;color:var(--ink,#1a1530);}',
+    '.a-kpi .s{font-size:12px;color:color-mix(in oklab,var(--ink,#1a1530) 50%,transparent);margin-top:4px;}',
+    '.a-kpi.hl{background:linear-gradient(135deg,var(--p1,#ff7a59),var(--p3,#8b5cf6));color:#fff;border:0;}',
+    '.a-kpi.hl .l,.a-kpi.hl .s{color:rgba(255,255,255,.8);}',
+    '.a-kpi.hl .v{color:#fff;}',
+    '.a-quota{display:flex;align-items:center;gap:16px;padding:12px 16px;background:var(--paper-2,#f3ece1);border-radius:12px;margin-bottom:20px;font-size:13px;color:var(--ink,#1a1530);flex-wrap:wrap;}',
+    '.a-quota .bar{flex:1;height:6px;background:color-mix(in oklab,var(--ink,#1a1530) 10%,transparent);border-radius:99px;overflow:hidden;min-width:140px;}',
+    '.a-quota .bar>i{display:block;height:100%;background:#22c55e;border-radius:99px;transition:width .3s;}',
+    '.a-quota.warn .bar>i{background:#f59e0b;}',
+    '.a-quota.danger .bar>i{background:#ef4444;}',
+    '.a-users-head{display:flex;justify-content:space-between;align-items:center;margin:20px 0 10px;gap:12px;flex-wrap:wrap;}',
+    '.a-users-head h3{margin:0;font-size:16px;font-weight:700;color:var(--ink,#1a1530);}',
+    '.a-search{background:var(--paper-2,#f3ece1);border:0;padding:9px 14px;border-radius:10px;font-size:13px;width:240px;color:var(--ink,#1a1530);font-family:inherit;}',
+    '.a-search:focus{outline:2px solid var(--p3,#8b5cf6);outline-offset:1px;}',
+    '.a-row{display:grid;grid-template-columns:40px 1fr auto auto auto auto 20px;gap:14px;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;background:var(--card,#fff);cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s;}',
+    '.a-row:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.06);border-color:var(--p3,#8b5cf6);}',
+    '.a-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p1,#ff7a59),var(--p3,#8b5cf6));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;}',
+    '.a-info{min-width:0;}',
+    '.a-info .n{font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px;color:var(--ink,#1a1530);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
+    '.a-info .e{font-size:12px;color:color-mix(in oklab,var(--ink,#1a1530) 55%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
+    '.a-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}',
+    '.a-dot.on{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.18);}',
+    '.a-dot.rec{background:#f59e0b;}',
+    '.a-dot.off{background:#cbd5e1;}',
+    '.a-stat{text-align:right;min-width:70px;}',
+    '.a-stat .lbl{font-size:10px;color:color-mix(in oklab,var(--ink,#1a1530) 55%,transparent);text-transform:uppercase;letter-spacing:.05em;font-weight:700;}',
+    '.a-stat .val{font-weight:800;font-size:15px;color:var(--ink,#1a1530);}',
+    '.a-when{font-size:12px;color:color-mix(in oklab,var(--ink,#1a1530) 50%,transparent);min-width:80px;text-align:right;}',
+    '.a-caret{color:color-mix(in oklab,var(--ink,#1a1530) 35%,transparent);font-size:18px;text-align:center;}',
+    '@media (max-width:900px){.a-row{grid-template-columns:40px 1fr auto;}.a-row .a-stat:nth-of-type(2),.a-row .a-stat:nth-of-type(3),.a-row .a-when,.a-row .a-caret{display:none;}}',
+    /* User detail modal */
+    '#userDetailOverlay{position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}',
+    '#userDetailOverlay.open{display:flex;animation:fadeIn .2s ease;}',
+    '@keyframes fadeIn{from{opacity:0}to{opacity:1}}',
+    '#userDetailModal{background:var(--card,#fff);border-radius:22px;width:min(880px,100%);max-height:90dvh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35);animation:slideUp .25s cubic-bezier(.2,.9,.3,1);}',
+    '@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}',
+    '.ud-head{display:flex;align-items:center;gap:16px;padding:22px 26px;border-bottom:1px solid var(--line);}',
+    '.ud-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--p1,#ff7a59),var(--p3,#8b5cf6));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;}',
+    '.ud-title{flex:1;min-width:0;}',
+    '.ud-title h3{margin:0;font-size:22px;font-weight:800;color:var(--ink,#1a1530);display:flex;align-items:center;gap:8px;}',
+    '.ud-title .em{font-size:13px;color:color-mix(in oklab,var(--ink,#1a1530) 55%,transparent);margin-top:2px;word-break:break-all;}',
+    '.ud-close{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--paper-2,#f3ece1);color:var(--ink,#1a1530);font-size:18px;cursor:pointer;flex-shrink:0;}',
+    '.ud-close:hover{background:rgba(220,38,38,.12);color:#dc2626;}',
+    '.ud-body{overflow-y:auto;padding:22px 26px 26px;flex:1;display:flex;flex-direction:column;gap:18px;}',
+    '.ud-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}',
+    '@media (max-width:600px){.ud-kpis{grid-template-columns:1fr 1fr;}}',
+    '.ud-kpi{background:var(--paper-2,#f3ece1);border-radius:12px;padding:14px;}',
+    '.ud-kpi .l{font-size:10px;font-weight:700;color:color-mix(in oklab,var(--ink,#1a1530) 55%,transparent);text-transform:uppercase;letter-spacing:.05em;}',
+    '.ud-kpi .v{font-size:24px;font-weight:800;margin-top:2px;color:var(--ink,#1a1530);}',
+    '.ud-section h4{margin:0 0 10px;font-size:12px;font-weight:700;color:color-mix(in oklab,var(--ink,#1a1530) 55%,transparent);text-transform:uppercase;letter-spacing:.06em;}',
+    '.ud-subj-table{width:100%;border-collapse:collapse;font-size:13px;}',
+    '.ud-subj-table th{text-align:left;padding:8px 10px;font-size:11px;color:color-mix(in oklab,var(--ink,#1a1530) 55%,transparent);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--line);font-weight:700;}',
+    '.ud-subj-table td{padding:10px;border-bottom:1px solid var(--line);color:var(--ink,#1a1530);}',
+    '.ud-subj-table tr:last-child td{border-bottom:0;}',
+    '.ud-hist-row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;}',
+    '.ud-hist-row:last-child{border:0;}',
+    '.ud-hist-mode{background:color-mix(in oklab,var(--p3,#8b5cf6) 15%,transparent);color:var(--p3,#8b5cf6);border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;flex-shrink:0;}',
+    '.ud-hist-subj{font-weight:600;flex:1;min-width:0;color:var(--ink,#1a1530);}',
+    '.ud-hist-stats{font-size:12px;color:color-mix(in oklab,var(--ink,#1a1530) 55%,transparent);}',
+    '.ud-hist-date{font-size:11px;color:color-mix(in oklab,var(--ink,#1a1530) 50%,transparent);margin-left:8px;}',
+    '.ud-empty{padding:24px;text-align:center;color:color-mix(in oklab,var(--ink,#1a1530) 50%,transparent);font-size:13px;border:1px dashed var(--line);border-radius:12px;}',
+    /* Connections & Guests clean rows */
+    '.day-header{display:flex;align-items:center;gap:10px;margin:18px 0 10px;font-size:12px;font-weight:800;color:color-mix(in oklab,var(--ink,#1a1530) 55%,transparent);text-transform:uppercase;letter-spacing:.08em;}',
+    '.day-header::before{content:"";height:1px;flex:0 0 24px;background:var(--line);}',
+    '.day-header::after{content:"";height:1px;flex:1;background:var(--line);}',
+    '.day-header .count{background:var(--paper-2,#f3ece1);color:color-mix(in oklab,var(--ink,#1a1530) 70%,transparent);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:none;}',
+    '.c-row{display:grid;grid-template-columns:40px 1fr auto auto auto auto;gap:14px;align-items:center;padding:12px 16px;border:1px solid var(--line);border-radius:12px;margin-bottom:6px;background:var(--card,#fff);}',
+    '.fb-chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:color-mix(in oklab,var(--p1,#ff7a45) 12%,transparent);color:color-mix(in oklab,var(--p1,#ff7a45) 85%,var(--ink,#1a1530));white-space:nowrap;font-variant-numeric:tabular-nums;}',
+    '.fb-chip.warn{background:rgba(239,68,68,.14);color:#dc2626;}',
+    '.c-row .a-when,.c-row .a-info{min-width:0;}',
+    '.c-device{font-size:13px;color:color-mix(in oklab,var(--ink,#1a1530) 70%,transparent);white-space:nowrap;}',
+    '.c-time{font-family:"Outfit",sans-serif;font-size:16px;font-weight:700;color:var(--ink,#1a1530);font-variant-numeric:tabular-nums;}',
+    '.c-pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;}',
+    '.c-pill.ok{background:rgba(34,197,94,.15);color:#15803d;}',
+    '.c-pill.muted{background:var(--paper-2,#f3ece1);color:color-mix(in oklab,var(--ink,#1a1530) 60%,transparent);}',
+    '.c-pill.live{background:rgba(239,68,68,.14);color:#dc2626;position:relative;padding-left:18px;}',
+    '.c-pill.live::before{content:"";position:absolute;left:7px;top:50%;transform:translateY(-50%);width:6px;height:6px;background:#dc2626;border-radius:50%;animation:pulse 1.6s infinite;}',
+    '@keyframes pulse{0%,100%{opacity:1;transform:translateY(-50%) scale(1)}50%{opacity:.4;transform:translateY(-50%) scale(1.4)}}',
+    '@media (max-width:800px){.c-row{grid-template-columns:40px 1fr auto auto;}.c-row .c-device,.c-row .c-time{display:none;}}',
+    '.g-row{display:grid;grid-template-columns:40px 1fr auto auto auto auto auto;gap:14px;align-items:center;padding:12px 16px;border:1px solid var(--line);border-radius:12px;margin-bottom:6px;background:var(--card,#fff);}',
+    '@media (max-width:900px){.g-row{grid-template-columns:40px 1fr auto auto auto;}.g-row .c-device,.g-row .a-when:not(:last-child){display:none;}.g-row .c-time:nth-of-type(2){display:none;}}',
+  ].join('');
+  document.head.appendChild(adminOptAStyle);
+
   /* ── FAB ── */
   var fab=document.createElement('button');
   fab.id='adminFab'; fab.title='Admin'; fab.textContent='⚙';
@@ -2585,6 +3007,16 @@ init();
     + '<div id="adminBody"></div>'
     + '</div>';
   document.body.appendChild(overlay);
+
+  /* User detail overlay */
+  var udOverlay=document.createElement('div');
+  udOverlay.id='userDetailOverlay';
+  udOverlay.innerHTML='<div id="userDetailModal"><div class="ud-head"><div class="ud-avatar" id="udAvatar">?</div><div class="ud-title"><h3 id="udName">-</h3><div class="em" id="udEmail">-</div></div><button class="ud-close" id="udClose">&#x2715;</button></div><div class="ud-body" id="udBody"></div></div>';
+  document.body.appendChild(udOverlay);
+  document.getElementById('udClose').addEventListener('click',function(){ udOverlay.classList.remove('open'); });
+  udOverlay.addEventListener('click',function(e){ if(e.target===udOverlay) udOverlay.classList.remove('open'); });
+
+  var currentUsers=[];
 
   var isUnlocked=false;
   var currentTab='users';
@@ -2769,69 +3201,122 @@ init();
       var globalAcc=totalAnswered?Math.round(totalCorrect/totalAnswered*1000)/10:0;
       sub.textContent=totalUsers+' usuario'+(totalUsers!==1?'s':'')+' registrado'+(totalUsers!==1?'s':'');
 
-      var html='<div class="admin-page">'+renderQuotaWidget(quota)
-        +'<div class="admin-kpi-grid">'
-        +kpiCard('Total usuarios', String(totalUsers), 'Excluye tu cuenta admin')
-        +kpiCard('Activos hoy', String(activeToday), 'Con actividad en 24 h')
-        +kpiCard('Activos 7 días', String(active7d), 'Seguimiento reciente')
-        +kpiCard('Sesiones totales', String(totalSessions), 'Sumadas desde progress')
-        +kpiCard('Acierto global', globalAcc.toFixed(1)+'%', totalAnswered+' respuestas evaluadas')
-        +'</div>';
+      currentUsers=users;
+      /* Quota compact */
+      var qUsed=(quota&&quota.used)||0, qLimit=(quota&&quota.limit)||20000, qPct=qLimit?Math.min(100,Math.round(qUsed/qLimit*100)):0;
+      var qCls=qPct>=80?'danger':(qPct>=50?'warn':'');
+      var qResetTxt=(quota&&quota.nextReset)?new Date(quota.nextReset).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+      var quotaHtml='<div class="a-quota '+qCls+'"><span>💾</span><span><b>Firebase:</b> '+qUsed.toLocaleString('es-ES')+' / '+qLimit.toLocaleString('es-ES')+' escrituras hoy</span><div class="bar"><i style="width:'+qPct+'%"></i></div><span><b>'+qPct+'%</b>'+(qResetTxt?(' · reinicio '+esc(qResetTxt)):'')+'</span></div>';
+
+      var html='<div class="admin-page">'
+        +'<div class="a-kpis">'
+        +'<div class="a-kpi hl"><div class="l">Total usuarios</div><div class="v">'+totalUsers+'</div><div class="s">Excluye tu cuenta admin</div></div>'
+        +'<div class="a-kpi"><div class="l">Activos hoy</div><div class="v">'+activeToday+'</div><div class="s">Con actividad en 24 h</div></div>'
+        +'<div class="a-kpi"><div class="l">Sesiones totales</div><div class="v">'+totalSessions+'</div><div class="s">Sumadas de todos</div></div>'
+        +'<div class="a-kpi"><div class="l">Acierto global</div><div class="v">'+globalAcc.toFixed(1)+'%</div><div class="s">'+totalAnswered.toLocaleString('es-ES')+' respuestas</div></div>'
+        +'</div>'
+        +quotaHtml
+        +'<div class="a-users-head"><h3>👥 Usuarios</h3><input class="a-search" id="aUserSearch" placeholder="Buscar por nombre o email..."></div>'
+        +'<div id="aUsersList">';
 
       if(!users.length){
-        html+=adminSection('Usuarios','Todavía no hay usuarios registrados en Firestore.','<div class="admin-empty">No hay usuarios registrados todavía.</div>');
+        html+='<div class="admin-empty">No hay usuarios registrados todavía.</div>';
       } else {
-        var list='';
         for(var j=0;j<users.length;j++){
           var u=users[j], t=totalsFromProg(u.prog);
           var acc=t.answered?Math.round(t.correct/t.answered*1000)/10:0;
           var dc=dotCls(u.last);
-          var subjRows='';
-          for(var k=0;k<ALL_SUBJECTS.length;k++){
-            var sk=ALL_SUBJECTS[k], ss=subjectStats(u.prog, sk);
-            if(!ss) continue;
-            subjRows+='<tr><td style="font-weight:600;">'+esc(sk)+'</td><td>'+ss.sessions+'</td><td>'+ss.answered+'</td><td>'+ss.acc.toFixed(1)+'%</td><td>'+ss.timeMin+' min</td><td>'+ss.days+' días</td><td>'+scorePill(ss.examBest)+'</td><td>'+scorePill(ss.examAvg)+'</td></tr>';
-          }
-          var histRows='', allHist=[];
-          for(var h=0;h<ALL_SUBJECTS.length;h++){
-            var sh=ALL_SUBJECTS[h], subData=(u.prog||{})[sh];
-            if(!subData||!subData.history) continue;
-            for(var hi=0;hi<subData.history.length;hi++) allHist.push(Object.assign({},subData.history[hi],{subject:sh}));
-          }
-          allHist.sort(function(a,b){ return (b.finishedAt||'').localeCompare(a.finishedAt||''); });
-          for(var hr=0;hr<Math.min(8,allHist.length);hr++){
-            var he=allHist[hr];
-            var modeLabel={'cuestionario':'Quiz','practicas':'Prácticas','examen':'Examen','examen1':'Examen 1','examenTotal':'Exam Total'}[he.mode]||he.mode||'?';
-            histRows+='<div class="hist-row"><span class="hist-mode">'+esc(modeLabel)+'</span><span style="font-size:12px;font-weight:600;flex:1;">'+esc(he.subject||'')+'</span><span style="font-size:11px;color:var(--muted);">'+he.correct+' ✓ '+he.wrong+' ✗ '+he.blank+' —'+(typeof he.score==='number'?' · '+scorePill(he.score):'')+'</span><span style="font-size:11px;color:var(--muted);margin-left:8px;">'+fullDate(he.finishedAt)+'</span></div>';
-          }
-          list+='<div class="auc" id="auc-'+j+'">'
-            +'<div class="auc-header" onclick="var d=document.getElementById(\'aucdet-'+j+'\');d.classList.toggle(\'open\');this.querySelector(\'.auc-toggle\').textContent=d.classList.contains(\'open\')?\'▲ Ocultar\':\'▼ Detalles\'">'
-            +'<div class="auc-avatar">'+esc(initials(u.name))+'</div>'
-            +'<div class="auc-info"><div class="auc-name"><span class="dot '+dc+'"></span>'+esc(u.name)+'</div><div class="auc-email">'+esc(u.email)+' · activo hace '+rel(u.last)+'</div></div>'
-            +'<div class="auc-stats"><span class="auc-stat">Sesiones <strong>'+t.sessions+'</strong></span><span class="auc-stat">Acierto <strong>'+acc.toFixed(1)+'%</strong></span><span class="auc-stat">Tiempo <strong>'+t.timeMin+' min</strong></span></div>'
-            +'<button class="auc-toggle">▼ Detalles</button></div>'
-            +'<div class="auc-detail" id="aucdet-'+j+'">'
-            +(subjRows?'<div style="overflow-x:auto;"><table class="subj-table"><thead><tr><th>Asignatura</th><th>Sesiones</th><th>Respondidas</th><th>Acierto</th><th>Tiempo</th><th>Días</th><th>Mejor nota</th><th>Media exam.</th></tr></thead><tbody>'+subjRows+'</tbody></table></div>':'<div class="admin-empty" style="padding:16px;">Sin actividad por asignatura todavía.</div>')
-            +(histRows?'<div class="user-history"><h5>Últimas sesiones</h5>'+histRows+'</div>':'')
-            +'</div></div>';
+          var dotClass=dc==='on'?'on':(dc==='rec'?'rec':'off');
+          html+='<div class="a-row" data-uix="'+j+'" data-search="'+esc((u.name||'')+' '+(u.email||'')).toLowerCase()+'">'
+            +'<div class="a-avatar">'+esc(initials(u.name))+'</div>'
+            +'<div class="a-info"><div class="n"><span class="a-dot '+dotClass+'"></span>'+esc(u.name)+'</div><div class="e">'+esc(u.email)+'</div></div>'
+            +'<div class="a-stat"><div class="lbl">Sesiones</div><div class="val">'+t.sessions+'</div></div>'
+            +'<div class="a-stat"><div class="lbl">Acierto</div><div class="val">'+acc.toFixed(1)+'%</div></div>'
+            +'<div class="a-stat"><div class="lbl">Tiempo</div><div class="val">'+t.timeMin+' min</div></div>'
+            +'<div class="a-when">'+rel(u.last)+'</div>'
+            +'<div class="a-caret">›</div>'
+            +'</div>';
         }
-        html+='<div class="admin-two-col">'
-          +adminSection('Usuarios registrados','Vista más visual con el mismo detalle de antes. Pulsa en cada tarjeta para abrir estadísticas y últimas sesiones.','<div class="admin-users-grid">'+list+'</div>')
-          +'<div class="admin-stack">'
-          +adminSection('Resumen rápido','Indicadores que ayudan a leer el estado general sin entrar en cada usuario.','<div class="admin-mini-list">'
-            +'<div class="admin-mini-item"><span>Usuarios visibles</span><strong>'+totalUsers+'</strong></div>'
-            +'<div class="admin-mini-item"><span>Sesiones acumuladas</span><strong>'+totalSessions+'</strong></div>'
-            +'<div class="admin-mini-item"><span>Respuestas totales</span><strong>'+totalAnswered+'</strong></div>'
-            +'<div class="admin-mini-item"><span>Asignaturas con datos</span><strong>'+ALL_SUBJECTS.length+'</strong></div>'
-          +'</div>')
-          +adminSection('Lectura del panel','El punto verde marca actividad reciente. El desplegable conserva las tablas por asignatura y el histórico de sesiones como en tu versión anterior.','<div class="admin-note"><b>Consejo:</b> usa esta pestaña para revisar quién estudia más, qué usuarios están activos y cómo evolucionan las notas de examen sin perder los detalles técnicos que ya tenías.</div>')
-          +'</div></div>';
       }
+      html+='</div>';
       body.innerHTML=html+'</div>';
+
+      /* Attach handlers */
+      var rows=body.querySelectorAll('.a-row');
+      for(var rx=0;rx<rows.length;rx++){
+        (function(row){
+          row.addEventListener('click',function(){ openUserDetail(parseInt(row.getAttribute('data-uix'),10)); });
+        })(rows[rx]);
+      }
+      var searchEl=document.getElementById('aUserSearch');
+      if(searchEl){
+        searchEl.addEventListener('input',function(){
+          var q=this.value.toLowerCase().trim();
+          var all=body.querySelectorAll('.a-row');
+          for(var si=0;si<all.length;si++){
+            all[si].style.display=(!q||all[si].getAttribute('data-search').indexOf(q)!==-1)?'':'none';
+          }
+        });
+      }
     }catch(e){
       renderAdminError(e);
       try{ console.error('ADMIN_USERS_ERROR',e); }catch(_){}
     }
+  }
+
+  /* ── USER DETAIL MODAL ── */
+  function openUserDetail(ix){
+    var u=currentUsers[ix]; if(!u) return;
+    var t=totalsFromProg(u.prog);
+    var acc=t.answered?(t.correct/t.answered*100):0;
+    var dc=dotCls(u.last), dotClass=dc==='on'?'on':(dc==='rec'?'rec':'off');
+    document.getElementById('udAvatar').textContent=initials(u.name);
+    document.getElementById('udName').innerHTML='<span class="a-dot '+dotClass+'" style="margin-right:4px;"></span>'+esc(u.name);
+    document.getElementById('udEmail').textContent=u.email+' · activo hace '+rel(u.last);
+
+    /* compute best exam score across all subjects */
+    var bestOverall=null;
+    for(var bk=0;bk<ALL_SUBJECTS.length;bk++){
+      var ssb=subjectStats(u.prog, ALL_SUBJECTS[bk]);
+      if(ssb && typeof ssb.examBest==='number') bestOverall=(bestOverall===null)?ssb.examBest:Math.max(bestOverall,ssb.examBest);
+    }
+
+    var body=document.getElementById('udBody');
+    var subjRows='', subjCount=0;
+    for(var k=0;k<ALL_SUBJECTS.length;k++){
+      var sk=ALL_SUBJECTS[k], ss=subjectStats(u.prog, sk);
+      if(!ss) continue;
+      subjCount++;
+      subjRows+='<tr><td style="font-weight:700;">'+esc(sk)+'</td><td>'+ss.sessions+'</td><td>'+ss.answered+'</td><td>'+ss.acc.toFixed(1)+'%</td><td>'+ss.timeMin+' min</td><td>'+ss.days+' d</td><td>'+scorePill(ss.examBest)+'</td><td>'+scorePill(ss.examAvg)+'</td></tr>';
+    }
+    var histRows='', allHist=[];
+    for(var h=0;h<ALL_SUBJECTS.length;h++){
+      var sh=ALL_SUBJECTS[h], subData=(u.prog||{})[sh];
+      if(!subData||!subData.history) continue;
+      for(var hi=0;hi<subData.history.length;hi++) allHist.push(Object.assign({},subData.history[hi],{subject:sh}));
+    }
+    allHist.sort(function(a,b){ return (b.finishedAt||'').localeCompare(a.finishedAt||''); });
+    for(var hr=0;hr<Math.min(12,allHist.length);hr++){
+      var he=allHist[hr];
+      var modeLabel={'cuestionario':'Quiz','practicas':'Prácticas','examen':'Examen','examen1':'Examen 1','examenTotal':'Exam Total','examenPersonalizado':'Personalizado'}[he.mode]||he.mode||'?';
+      histRows+='<div class="ud-hist-row"><span class="ud-hist-mode">'+esc(modeLabel)+'</span><span class="ud-hist-subj">'+esc(he.subject||'')+'</span><span class="ud-hist-stats">'+he.correct+' ✓ · '+he.wrong+' ✗ · '+he.blank+' —'+(typeof he.score==='number'?(' · '+scorePill(he.score)):'')+'</span><span class="ud-hist-date">'+fullDate(he.finishedAt)+'</span></div>';
+    }
+
+    body.innerHTML=
+      '<div class="ud-kpis">'
+      +'<div class="ud-kpi"><div class="l">Sesiones</div><div class="v">'+t.sessions+'</div></div>'
+      +'<div class="ud-kpi"><div class="l">Acierto</div><div class="v">'+acc.toFixed(1)+'%</div></div>'
+      +'<div class="ud-kpi"><div class="l">Tiempo</div><div class="v">'+t.timeMin+'m</div></div>'
+      +'<div class="ud-kpi"><div class="l">Mejor nota</div><div class="v">'+(bestOverall!==null?bestOverall.toFixed(1):'—')+'</div></div>'
+      +'</div>'
+      +'<div class="ud-section"><h4>📚 Por asignatura ('+subjCount+')</h4>'
+      +(subjRows?'<div style="overflow-x:auto;"><table class="ud-subj-table"><thead><tr><th>Asignatura</th><th>Sesiones</th><th>Resp.</th><th>Acierto</th><th>Tiempo</th><th>Días</th><th>Mejor</th><th>Media ex.</th></tr></thead><tbody>'+subjRows+'</tbody></table></div>':'<div class="ud-empty">Sin actividad por asignatura todavía.</div>')
+      +'</div>'
+      +'<div class="ud-section"><h4>🕐 Últimas sesiones</h4>'
+      +(histRows?histRows:'<div class="ud-empty">Sin histórico de sesiones.</div>')
+      +'</div>';
+
+    udOverlay.classList.add('open');
   }
 
   /* ── CONNECTIONS TAB ── */
@@ -2842,60 +3327,63 @@ init();
     body.innerHTML='<div class="admin-msg">⏳ Cargando historial...</div>';
     try{
       if(!window.db) throw {code:'db-unavailable',message:'Firestore no inicializado.'};
-      var data=await Promise.all([
-        window.db.collection('connections').orderBy('timestamp','desc').limit(100).get(),
-        getQuotaUsageSummary()
-      ]);
-      var snap=data[0], quota=data[1];
-      var byDay={}, dayOrder=[], allEmails={}, totalVisible=0;
+      var snap=await window.db.collection('connections').orderBy('timestamp','desc').limit(100).get();
+      var byDay={}, dayOrder=[], allEmails={}, totalVisible=0, lastConn=null;
       snap.forEach(function(d){
         var item=d.data()||{};
         if((item.email||'')===ADMIN_EMAIL) return;
         totalVisible++;
         var ts=item.timestamp||'';
+        if(!lastConn||ts>lastConn) lastConn=ts;
         var day=ts?ts.slice(0,10):'sin-fecha';
         if(!byDay[day]){ byDay[day]=[]; dayOrder.push(day); }
         byDay[day].push(item);
         if(item.email) allEmails[item.email]=1;
       });
       sub.textContent=totalVisible+' conexiones registradas · '+Object.keys(allEmails).length+' usuarios únicos';
-      var html='<div class="admin-page">'+renderQuotaWidget(quota)
-        +'<div class="admin-kpi-grid">'
-        +kpiCard('Conexiones totales', String(totalVisible), 'Últimos 100 registros')
-        +kpiCard('Usuarios únicos', String(Object.keys(allEmails).length), 'Excluye tu cuenta admin')
-        +kpiCard('Días con actividad', String(dayOrder.length), 'Agrupado por fecha')
+      var uniqueCount=Object.keys(allEmails).length;
+      var html='<div class="admin-page">'
+        +'<div class="a-kpis">'
+        +'<div class="a-kpi hl"><div class="l">Conexiones</div><div class="v">'+totalVisible+'</div><div class="s">Últimos 100 registros</div></div>'
+        +'<div class="a-kpi"><div class="l">Usuarios únicos</div><div class="v">'+uniqueCount+'</div><div class="s">Excluye tu cuenta admin</div></div>'
+        +'<div class="a-kpi"><div class="l">Días con actividad</div><div class="v">'+dayOrder.length+'</div><div class="s">Agrupado por fecha</div></div>'
+        +'<div class="a-kpi"><div class="l">Última conexión</div><div class="v" style="font-size:22px;">'+(lastConn?esc(rel(lastConn)):'—')+'</div><div class="s">'+(lastConn?esc(fullDate(lastConn)):'sin datos')+'</div></div>'
         +'</div>';
       if(!totalVisible){
-        html+=adminSection('Conexiones','Aún no hay conexiones registradas.','<div class="admin-empty">Se registrarán a partir de ahora al iniciar sesión con Google.</div>');
+        html+='<div class="admin-empty">Se registrarán a partir de ahora al iniciar sesión con Google.</div>';
       } else {
-        var list='';
+        html+='<div class="a-users-head"><h3>🕐 Historial</h3><input class="a-search" id="aConnSearch" placeholder="Buscar por nombre o email..."></div>';
         for(var di=0;di<dayOrder.length;di++){
           var day=dayOrder[di], entries=byDay[day];
-          list+=dayLabelEs(day,'('+entries.length+' conexiones)')+'<div class="admin-list">';
+          var dayLabel=(day==='sin-fecha')?'Sin fecha':new Date(day+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+          html+='<div class="day-header"><span>'+esc(dayLabel)+'</span><span class="count">'+entries.length+'</span></div>';
           for(var ei=0;ei<entries.length;ei++){
-            var e=entries[ei], status='';
-            list+='<article class="admin-entry"><div class="admin-entry-top"><div><div class="admin-entry-name">'+esc(e.displayName||e.email||'?')+'</div><div class="admin-entry-sub">'+esc(e.email||'Sin email')+' · '+esc(rel(e.timestamp))+'</div></div>'+statePillHtml(e.timestamp&&((Date.now()-new Date(e.timestamp))<3600000)?'Reciente':'Histórico', e.timestamp&&((Date.now()-new Date(e.timestamp))<3600000)?'ok':'muted')+'</div>'
-              +'<div class="admin-detail-grid">'
-              +'<div class="admin-chip-box"><strong>Hora</strong>'+esc(e.timestamp?e.timestamp.slice(11,16):'--:--')+'</div>'
-              +'<div class="admin-chip-box"><strong>Fecha completa</strong>'+esc(fullDate(e.timestamp))+'</div>'
-              +'<div class="admin-chip-box"><strong>Dispositivo</strong>'+esc(deviceShort(e.ua||''))+'</div>'
-              +'</div>'
-              +'<div class="admin-context"><b>User agent:</b> '+esc(e.ua||'Sin dato')+'</div></article>';
+            var e=entries[ei];
+            var recent=e.timestamp&&((Date.now()-new Date(e.timestamp))<3600000);
+            var pill=recent?'<span class="c-pill ok">● Reciente</span>':'<span class="c-pill muted">Histórico</span>';
+            var time=e.timestamp?e.timestamp.slice(11,16):'--:--';
+            /* 1 escritura por login · cuota Spark = 20.000/día */
+            var fbPct=(1/20000*100).toFixed(3)+'%';
+            html+='<div class="c-row" data-search="'+esc((e.displayName||'')+' '+(e.email||'')).toLowerCase()+'">'
+              +'<div class="a-avatar">'+esc(initials(e.displayName||e.email))+'</div>'
+              +'<div class="a-info"><div class="n">'+esc(e.displayName||e.email||'?')+'</div><div class="e">'+esc(e.email||'Sin email')+'</div></div>'
+              +'<div class="c-time">'+esc(time)+'</div>'
+              +'<div class="c-device">'+esc(deviceShort(e.ua||''))+'</div>'
+              +'<span class="fb-chip" title="≈1 escritura · '+fbPct+' de la cuota diaria Firebase (20.000)">'+fbPct+'</span>'
+              +pill
+              +'</div>';
           }
-          list+='</div>';
         }
-        html+='<div class="admin-two-col">'
-          +adminSection('Historial de conexiones','Cronología más clara y legible, sin perder la fecha, el email ni el dispositivo.','<div class="admin-stack">'+list+'</div>')
-          +'<div class="admin-stack">'
-          +adminSection('Resumen rápido','Referencia visual para entender el tráfico sin leer cada fila.','<div class="admin-mini-list">'
-            +'<div class="admin-mini-item"><span>Conexiones visibles</span><strong>'+totalVisible+'</strong></div>'
-            +'<div class="admin-mini-item"><span>Usuarios únicos</span><strong>'+Object.keys(allEmails).length+'</strong></div>'
-            +'<div class="admin-mini-item"><span>Primer bloque</span><strong>'+(dayOrder[0]?esc(dayOrder[0].split('-').reverse().join('/')):'-')+'</strong></div>'
-          +'</div>')
-          +adminSection('Qué ves aquí','Esta pestaña sirve para comprobar qué cuentas entran con Google, cuándo lo hacen y desde qué dispositivo. La cuota de Firebase se mantiene visible arriba.','<div class="admin-note"><b>Nota:</b> tu propia cuenta admin no se incluye en esta lista para no contaminar los datos.</div>')
-          +'</div></div>';
       }
       body.innerHTML=html+'</div>';
+      var sEl=document.getElementById('aConnSearch');
+      if(sEl){
+        sEl.addEventListener('input',function(){
+          var q=this.value.toLowerCase().trim();
+          var rows=body.querySelectorAll('.c-row');
+          for(var i=0;i<rows.length;i++) rows[i].style.display=(!q||rows[i].getAttribute('data-search').indexOf(q)!==-1)?'':'none';
+        });
+      }
     }catch(e){
       renderAdminError(e);
       try{ console.error('ADMIN_CONNECTIONS_ERROR',e); }catch(_){}
@@ -2910,11 +3398,7 @@ init();
     body.innerHTML='<div class="admin-msg">⏳ Cargando invitados...</div>';
     try{
       if(!window.db) throw {code:'db-unavailable',message:'Firestore no inicializado.'};
-      var data=await Promise.all([
-        window.db.collection(GUEST_COLLECTION).orderBy('lastSeen','desc').limit(100).get(),
-        getQuotaUsageSummary()
-      ]);
-      var snap=data[0], quota=data[1];
+      var snap=await window.db.collection(GUEST_COLLECTION).orderBy('lastSeen','desc').limit(100).get();
       var byDay={}, dayOrder=[], visitors={}, activeNow=0, totalDuration=0, visibleCount=0, convertedCount=0;
       snap.forEach(function(d){
         var item=d.data()||{};
@@ -2928,52 +3412,60 @@ init();
         if(guestIsActive(item.lastSeen||item.startedAt)) activeNow++;
         totalDuration+=Number(item.durationMs||0);
       });
-      if(!visibleCount){
-        body.innerHTML='<div class="admin-page">'+renderQuotaWidget(quota)+adminSection('Invitados','No hay invitados reales ahora mismo. Las sesiones convertidas a Gmail ya no se muestran aquí.','<div class="admin-empty">Sin invitados reales. Cuando alguien entre sin iniciar sesión, aparecerá aquí.</div>')+'</div>';
-        sub.textContent='Sin invitados reales';
-        return;
-      }
       sub.textContent=visibleCount+' sesiones invitado · '+Object.keys(visitors).length+' invitados únicos';
       var avgDuration=visibleCount?durationText(totalDuration/visibleCount):'0 min';
-      var list='';
-      for(var di=0;di<dayOrder.length;di++){
-        var day=dayOrder[di], entries=byDay[day];
-        list+=dayLabelEs(day,'('+entries.length+' sesiones)')+'<div class="admin-list">';
-        for(var ei=0;ei<entries.length;ei++){
-          var e=entries[ei]||{};
-          var started=e.startedAt||'';
-          var active=guestIsActive(e.lastSeen||started);
-          list+='<article class="admin-entry"><div class="admin-entry-top"><div><div class="admin-entry-name">'+esc(e.displayName||guestNameFromId(e.visitorId||''))+'</div><div class="admin-entry-sub">'+esc(e.visitorId||'Sin visitorId')+' · '+esc(rel(e.lastSeen||started))+'</div></div>'
-            +(active?statePillHtml('Activo ahora','ok'):statePillHtml('Inactivo','muted'))+'</div>'
-            +'<div class="admin-detail-grid">'
-            +'<div class="admin-chip-box"><strong>Inicio</strong>'+esc(fullDate(e.startedAt))+'</div>'
-            +'<div class="admin-chip-box"><strong>Última actividad</strong>'+esc(fullDate(e.lastSeen))+'</div>'
-            +'<div class="admin-chip-box"><strong>Duración</strong>'+esc(durationText(e.durationMs))+'</div>'
-            +'<div class="admin-chip-box"><strong>Dispositivo</strong>'+esc(deviceShort(e.ua||''))+'</div>'
-            +'</div>'
-            +'<div class="admin-context"><b>Session ID:</b> '+esc(e.sessionId||'')+'<br><b>Visitor ID:</b> '+esc(e.visitorId||'')+(e.lastPath?'<br><b>Ruta:</b> '+esc(e.lastPath):'')+'</div></article>';
+      var uniqCount=Object.keys(visitors).length;
+      var html='<div class="admin-page">'
+        +'<div class="a-kpis">'
+        +'<div class="a-kpi hl"><div class="l">Sesiones invitado</div><div class="v">'+visibleCount+'</div><div class="s">Sin Gmail · últimos 100</div></div>'
+        +'<div class="a-kpi"><div class="l">Invitados únicos</div><div class="v">'+uniqCount+'</div><div class="s">Calculado por visitorId</div></div>'
+        +'<div class="a-kpi"><div class="l">Activos ahora</div><div class="v">'+activeNow+'</div><div class="s">Ping reciente</div></div>'
+        +'<div class="a-kpi"><div class="l">Duración media</div><div class="v" style="font-size:22px;">'+esc(avgDuration)+'</div><div class="s">Tiempo abierto estimado</div></div>'
+        +'</div>';
+      if(!visibleCount){
+        html+='<div class="admin-empty">Sin invitados reales. Cuando alguien entre sin iniciar sesión, aparecerá aquí.</div>';
+      } else {
+        html+='<div class="a-users-head"><h3>👥 Actividad de invitados</h3><input class="a-search" id="aGuestSearch" placeholder="Buscar por nombre o visitorId..."></div>';
+        for(var di=0;di<dayOrder.length;di++){
+          var day=dayOrder[di], entries=byDay[day];
+          var dayLabel=(day==='sin-fecha')?'Sin fecha':new Date(day+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+          html+='<div class="day-header"><span>'+esc(dayLabel)+'</span><span class="count">'+entries.length+'</span></div>';
+          for(var ei=0;ei<entries.length;ei++){
+            var e=entries[ei]||{};
+            var started=e.startedAt||'';
+            var active=guestIsActive(e.lastSeen||started);
+            var pill=active?'<span class="c-pill live">● Activo</span>':'<span class="c-pill muted">Inactivo</span>';
+            var name=e.displayName||guestNameFromId(e.visitorId||'');
+            var vid=e.visitorId||'—';
+            var tStart=started?started.slice(11,16):'--:--';
+            var tLast=e.lastSeen?e.lastSeen.slice(11,16):'--:--';
+            /* Estimación: 1 escritura al iniciar + 1 ping cada 30s + 1 al cerrar */
+            var durMs=Number(e.durationMs||0);
+            var writes=1+Math.round(durMs/30000)+1;
+            var pctNum=writes/20000*100;
+            var fbPct=(pctNum<0.01?'<0.01':pctNum.toFixed(2))+'%';
+            var fbCls=pctNum>=1?'fb-chip warn':'fb-chip';
+            html+='<div class="g-row" data-search="'+esc((name||'')+' '+vid).toLowerCase()+'">'
+              +'<div class="a-avatar">'+esc(initials(name||vid))+'</div>'
+              +'<div class="a-info"><div class="n">'+esc(name)+'</div><div class="e">'+esc(vid)+'</div></div>'
+              +'<div class="c-time">'+esc(tStart)+'→'+esc(tLast)+'</div>'
+              +'<div class="c-time">'+esc(durationText(e.durationMs))+'</div>'
+              +'<div class="c-device">'+esc(deviceShort(e.ua||''))+'</div>'
+              +'<span class="'+fbCls+'" title="≈'+writes+' escrituras · '+fbPct+' de la cuota diaria Firebase (20.000)">'+fbPct+'</span>'
+              +pill
+              +'</div>';
+          }
         }
-        list+='</div>';
       }
-      var html='<div class="admin-page">'+renderQuotaWidget(quota)
-        +'<div class="admin-kpi-grid">'
-        +kpiCard('Sesiones invitado', String(visibleCount), 'Sin usuarios con Gmail')
-        +kpiCard('Invitados únicos', String(Object.keys(visitors).length), 'Calculado por visitorId')
-        +kpiCard('Activos ahora', String(activeNow), 'Último ping reciente')
-        +kpiCard('Duración media', esc(avgDuration), 'Tiempo abierto estimado')
-        +'</div>'
-        +'<div class="admin-two-col">'
-        +adminSection('Actividad de invitados','Aquí solo aparecen invitados reales. Las sesiones que pasan a Gmail quedan fuera para evitar duplicados.','<div class="admin-stack">'+list+'</div>')
-        +'<div class="admin-stack">'
-        +adminSection('Resumen rápido','Bloque lateral para lectura rápida del estado actual.','<div class="admin-mini-list">'
-          +'<div class="admin-mini-item"><span>Invitados reales</span><strong>'+Object.keys(visitors).length+'</strong></div>'
-          +'<div class="admin-mini-item"><span>Sesiones visibles</span><strong>'+visibleCount+'</strong></div>'
-          +'<div class="admin-mini-item"><span>Convertidos a Gmail</span><strong>'+convertedCount+'</strong></div>'
-          +'<div class="admin-mini-item"><span>Días con actividad</span><strong>'+dayOrder.length+'</strong></div>'
-        +'</div>')
-        +adminSection('Qué mejora este diseño','Más claridad visual, misma información, y lectura más cómoda en móvil y escritorio.','<div class="admin-note"><b>Incluye:</b> inicio, última actividad, duración, device, visitorId, sessionId, estado actual y la barra de cuota Firebase sin perder detalle técnico.</div>')
-        +'</div></div>';
       body.innerHTML=html+'</div>';
+      var sEl=document.getElementById('aGuestSearch');
+      if(sEl){
+        sEl.addEventListener('input',function(){
+          var q=this.value.toLowerCase().trim();
+          var rows=body.querySelectorAll('.g-row');
+          for(var i=0;i<rows.length;i++) rows[i].style.display=(!q||rows[i].getAttribute('data-search').indexOf(q)!==-1)?'':'none';
+        });
+      }
     }catch(e){
       renderAdminError(e);
       try{ console.error('ADMIN_GUESTS_ERROR',e); }catch(_){}
@@ -2994,6 +3486,66 @@ init();
     loadPanel();
   });
 
+  /* ── ACTIVE USERS COUNTER (admin only) ── */
+  var activeStyle=document.createElement('style');
+  activeStyle.textContent=[
+    '#adminActiveCounter{position:fixed;left:14px;bottom:14px;z-index:9998;display:none;align-items:center;gap:8px;padding:7px 12px 7px 10px;border-radius:99px;background:color-mix(in oklab,var(--card,#fff) 92%,transparent);border:1px solid var(--line,#ddd);box-shadow:0 4px 14px rgba(0,0,0,.08);font-family:"Outfit",sans-serif;font-size:13px;font-weight:700;color:var(--ink,#1a1530);cursor:default;user-select:none;backdrop-filter:blur(8px);transition:transform .15s;}',
+    '#adminActiveCounter:hover{transform:translateY(-1px);}',
+    '#adminActiveCounter .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.5);animation:aacPulse 2s infinite;}',
+    '#adminActiveCounter.zero .dot{background:#9ca3af;animation:none;box-shadow:none;}',
+    '#adminActiveCounter .lbl{opacity:.7;font-weight:500;font-size:12px;}',
+    '@keyframes aacPulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}'
+  ].join('');
+  document.head.appendChild(activeStyle);
+  var activeCounter=document.createElement('div');
+  activeCounter.id='adminActiveCounter';
+  activeCounter.innerHTML='<span class="dot"></span><span class="num">0</span><span class="lbl">activos</span>';
+  activeCounter.title='Cargando...';
+  document.body.appendChild(activeCounter);
+
+  var ACTIVE_WINDOW_MS=2*60*1000; /* 2 min */
+  var ACTIVE_POLL_MS=75*1000;     /* 75 s */
+  var activeTimer=null;
+  async function refreshActiveCounter(){
+    if(!isUnlocked||!window.db){ return; }
+    try{
+      var cutoff=new Date(Date.now()-ACTIVE_WINDOW_MS).toISOString();
+      var results=await Promise.all([
+        window.db.collection('connections').where('timestamp','>=',cutoff).get().catch(function(){return {forEach:function(){}};}),
+        window.db.collection(GUEST_COLLECTION).where('lastSeen','>=',cutoff).get().catch(function(){return {forEach:function(){}};})
+      ]);
+      var gmailEmails={}, guestIds={};
+      results[0].forEach(function(d){
+        var it=d.data()||{};
+        if((it.email||'')===ADMIN_EMAIL) return;
+        if(it.email) gmailEmails[it.email]=1;
+      });
+      results[1].forEach(function(d){
+        var it=d.data()||{};
+        if(it.convertedToAuth||it.authEmail) return;
+        if(it.visitorId) guestIds[it.visitorId]=1;
+      });
+      var nGmail=Object.keys(gmailEmails).length;
+      var nGuest=Object.keys(guestIds).length;
+      var total=nGmail+nGuest;
+      activeCounter.querySelector('.num').textContent=total;
+      activeCounter.classList.toggle('zero',total===0);
+      activeCounter.title=total+' activos en últimos 2 min · '+nGmail+' con Gmail · '+nGuest+' invitado'+(nGuest===1?'':'s');
+    }catch(e){
+      try{ console.warn('ACTIVE_COUNTER_ERR',e); }catch(_){}
+    }
+  }
+  function startActiveCounter(){
+    activeCounter.style.display='flex';
+    refreshActiveCounter();
+    if(activeTimer) clearInterval(activeTimer);
+    activeTimer=setInterval(refreshActiveCounter,ACTIVE_POLL_MS);
+  }
+  function stopActiveCounter(){
+    activeCounter.style.display='none';
+    if(activeTimer){ clearInterval(activeTimer); activeTimer=null; }
+  }
+
   /* ── AUTH LISTENER ── */
   function attachAuthListener(){
     if(window.firebase && window.firebase.auth){
@@ -3003,7 +3555,8 @@ init();
           var isAdmin=!!(user && user.email===ADMIN_EMAIL);
           isUnlocked=isAdmin;
           fab.style.display=isAdmin?'flex':'none';
-          if(!isAdmin){ overlay.classList.remove('open'); }
+          if(!isAdmin){ overlay.classList.remove('open'); stopActiveCounter(); }
+          else { startActiveCounter(); }
           if(user){
             markGuestSessionConverted(user);
             stopGuestTracking(true);
