@@ -1049,6 +1049,11 @@ body.quiz-active{}
         <button class="btn primary" id="helpBackBtn">&#x2190; Volver al inicio</button>
       </div>
       <div class="help-stack">
+        <div class="help-card" style="background:linear-gradient(135deg,color-mix(in oklab,var(--p3) 10%,var(--card)),color-mix(in oklab,var(--p1) 8%,var(--card)));border:1px solid color-mix(in oklab,var(--p3) 18%,transparent);">
+          <div class="badge mode">Aviso</div>
+          <h3>Una nota antes de usar la app</h3>
+          <div class="small">Esta es una aplicación que utilizo personalmente para estudiar. Si te resulta útil, eres totalmente bienvenido a usarla.<br><br>Si encuentras algún fallo o algo que se pueda mejorar, tenlo en cuenta y, si puedes, házmelo saber.<br><br>Gracias por usarla.</div>
+        </div>
         <div class="help-card">
           <div class="badge mode">Visión general</div>
           <h3>Qué puedes hacer en la app</h3>
@@ -1722,7 +1727,7 @@ function renderModeMenu(){ hidePracticePicker(); (function(){
   var s2=state.subject; if(!s2||!els.menuSubjectTitle) return;
   var subP=(progressStore&&progressStore[s2.short])||emptySubject();
   var topGif='';
-  try{ var avg=getSubjectAverageBestExamScore(s2.short); var reaction=getSubjectReaction(avg); if(reaction && reaction.src) topGif='<img src="'+reaction.src+'" alt="'+escapeHtml(reaction.alt||'Reacción de estudio')+'" title="Media de mejores notas: '+avg.toFixed(2)+'" style="width:92px;height:92px;object-fit:cover;border-radius:18px;border:1px solid var(--line);background:var(--paper-2);">'; }catch(e){}
+  try{ var avg=getSubjectAverageBestExamScore(s2.short); var reaction=getSubjectReaction(avg); if(reaction) topGif='<img src="'+reaction+'" alt="Reacción de estudio" style="width:92px;height:92px;object-fit:cover;border-radius:18px;border:1px solid var(--line);background:var(--paper-2);">'; }catch(e){}
   var gifHtml=topGif||('<div style="width:92px;height:92px;border-radius:18px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;background:var(--paper-2);font-size:34px;">'+escapeHtml(s2.icon||'📘')+'</div>');
   els.menuSubjectTitle.style.textTransform='none';
   els.menuSubjectTitle.style.letterSpacing='normal';
