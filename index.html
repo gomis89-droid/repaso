@@ -826,16 +826,25 @@ textarea.share-preview:focus{outline:none;border-color:var(--p3)}
 .bignum{font-family:var(--font-display);font-size:48px;font-weight:800;line-height:1;letter-spacing:-.03em}
 .subtle{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .btn.small{padding:8px 13px;font-size:13px}
-@media(max-width:640px){
-  .tb-actions{flex-wrap:wrap;justify-content:flex-end;gap:4px}
-  /* En móvil los botones del encabezado muestran solo el icono */
+@media(max-width:1024px){
+  /* En móvil y tablet los botones del encabezado muestran solo el icono
+     y se mantienen todos en una misma línea. */
+  .tb-actions{flex-wrap:nowrap;justify-content:flex-end;gap:4px}
   .tb-actions .tb-label{display:none}
-  .tb-actions .btn.small{padding:8px 10px;font-size:15px;line-height:1}
-  .tb-actions .btn{padding:8px 10px}
+  .tb-actions .btn,
+  .tb-actions .btn.small,
+  .tb-actions .icon-btn{padding:6px 9px;font-size:16px;line-height:1;min-width:0}
+  .tb-actions .btn>span,
+  .tb-actions .icon-btn>span{margin:0}
+}
+@media(max-width:640px){
   /* Oculta el subtítulo largo del brand para dejar más espacio al título */
   .brand-txt small{display:none}
   .brand-txt h1{font-size:22px;line-height:1.05}
   .brand-poo{font-size:30px}
+  .tb-actions .btn,
+  .tb-actions .btn.small,
+  .tb-actions .icon-btn{padding:5px 7px;font-size:15px}
 }
 @media(max-width:700px){
   .app{padding:12px 12px 80px}
@@ -1023,7 +1032,7 @@ body.quiz-active{}
     </div>
   </div>
   <div class="tb-actions toolbar">
-    <button class="btn ghost small" id="homeTopBtn" style="display:none;">&#x2190;<span class="tb-label"> Inicio</span></button>
+    <button class="btn ghost small" id="homeTopBtn" style="display:none;" title="Volver atrás" aria-label="Volver atrás">&#x2190;<span class="tb-label"> Atrás</span></button>
     <button class="btn ghost small" id="progressBtn">&#x1F4CA;<span class="tb-label"> Registro</span></button>
     <button class="btn ghost small" id="syncTopBtn" title="Sincronizar progreso con la nube" aria-label="Sincronizar progreso">&#x21BB;<span class="tb-label"> Sincronizar</span></button>
     <button class="btn ghost small" id="shareRegistryTopBtn" style="display:none;">&#x2197;<span class="tb-label"> Compartir</span></button>
@@ -1605,7 +1614,42 @@ function buildWeakQuestionMap(sub){
 }
 function getWeakQuestionPool(data){ if(!state.subject) return []; var sub=progressStore[state.subject.short] || emptySubject(); var map=buildWeakQuestionMap(sub); var refs=[]; for(var k in map){ if(map[k] && (map[k].wrong||0)>0) refs.push(map[k]); } refs.sort(function(a,b){ return (b.wrong||0)-(a.wrong||0); }); var lookup=buildQuestionLookups(data), out=[], seen={}; for(var i=0;i<refs.length;i++){ var ref=refs[i]||{}; var exactKey=(ref.section||'')+'||'+(ref.q||''); var full=lookup.byExact[exactKey] || lookup.byQ[ref.q||'']; if(!full) continue; var cloned=cloneData(full); cloned.block='Bloque 1 — Más falladas'; var sig=questionSignature(cloned); if(seen[sig]) continue; seen[sig]=1; out.push(cloned); } return out; }
 function buildReviewOptionsHtml(item, selectedIndex, showSelectedWrong){ var html=''; if(!item || !item.options || !item.options.length) return html; for(var k=0;k<item.options.length;k++){ var cls='review-option'; var suffix=''; if(k===item.correct){ cls+=' correct'; suffix=' <strong>✓ Correcta</strong>'; } if(showSelectedWrong && typeof selectedIndex==='number' && selectedIndex===k && k!==item.correct){ cls+=' wrong'; suffix=' <strong>✗ Tu respuesta</strong>'; } html+='<div class="'+cls+'">'+escapeHtml(item.options[k])+suffix+'</div>'; } return html; }
-function showScreen(name){ for(var k in screens){ if(screens[k]) screens[k].className='screen'; } if(screens[name]) screens[name].className='screen active'; var isHome=name==='home'; els.homeTopBtn.style.display=isHome?'none':'inline-flex'; els.progressBtn.style.display=(name==='progress')?'none':'inline-flex'; els.shareRegistryTopBtn.style.display='none'; if(els.themeBtn) els.themeBtn.style.display=isHome?'inline-flex':'none'; if(els.authControls) els.authControls.style.display=isHome?'inline-flex':'none'; if(document.body){ document.body.classList.toggle('quiz-active',name==='quiz'); } }
+/* Pila de navegación: permite ir un paso atrás en lugar de saltar al inicio. */
+var navStack=[]; var navSuppressPush=false; var currentScreen=null;
+function showScreen(name){
+  for(var k in screens){ if(screens[k]) screens[k].className='screen'; }
+  if(screens[name]) screens[name].className='screen active';
+  /* Registrar transición (excepto al inicio, que reinicia la pila, y al volver atrás) */
+  if(!navSuppressPush){
+    if(name==='home'){ navStack=[]; }
+    else if(currentScreen && currentScreen!==name){ navStack.push(currentScreen); }
+  }
+  currentScreen=name;
+  var isHome=name==='home';
+  /* El botón "atrás" del encabezado se muestra cuando no estamos en home */
+  els.homeTopBtn.style.display=isHome?'none':'inline-flex';
+  els.progressBtn.style.display=(name==='progress')?'none':'inline-flex';
+  els.shareRegistryTopBtn.style.display='none';
+  if(els.themeBtn) els.themeBtn.style.display=isHome?'inline-flex':'none';
+  if(els.authControls) els.authControls.style.display=isHome?'inline-flex':'none';
+  if(document.body){ document.body.classList.toggle('quiz-active',name==='quiz'); }
+}
+function goBack(){
+  /* Salir de la pantalla de examen pide confirmación por seguridad */
+  if(currentScreen==='quiz'){
+    if(!window.confirm('¿Salir de la sesión? Perderás el progreso actual.')) return;
+  }
+  var prev=navStack.length ? navStack.pop() : 'home';
+  navSuppressPush=true;
+  try{
+    /* Re-renderizar la pantalla previa con su contenido habitual */
+    if(prev==='menu' && state.subject){ renderModeMenu(); showScreen('menu'); }
+    else if(prev==='progress'){ renderProgress(); }
+    else if(prev==='home'){ navStack=[]; resetHome(); }
+    else { showScreen(prev); }
+  } finally { navSuppressPush=false; }
+}
+window.goBack=goBack;
 function getModeScoreStats(sub, mode){
   sub=sub||emptySubject();
   var modes=(sub && sub.modes && typeof sub.modes==='object') ? sub.modes : {};
@@ -2832,7 +2876,7 @@ function init(){ createAuthUi(); updateAuthUi(); setupFirebase(); applySavedThem
   if(els.listTopicsBtn) els.listTopicsBtn.addEventListener('click', function(){ state.listTopicFilter='all'; renderQuestionListScreen('temas'); }); if(els.listEval1Btn) els.listEval1Btn.addEventListener('click', function(){ state.listTopicFilter='all'; renderQuestionListScreen('eval1'); }); if(els.listEval2Btn) els.listEval2Btn.addEventListener('click', function(){ state.listTopicFilter='all'; renderQuestionListScreen('eval2'); }); if(els.listCasesBtn) els.listCasesBtn.addEventListener('click', function(){ state.listTopicFilter='all'; renderQuestionListScreen('casos'); }); els.listBackBtn.addEventListener('click', backSubject); els.listHomeBtn.addEventListener('click', resetHome); if(els.weakQuestionsTabBtn) els.weakQuestionsTabBtn.addEventListener('click', function(){ renderWeakScreen('questions'); }); if(els.weakCasesTabBtn) els.weakCasesTabBtn.addEventListener('click', function(){ renderWeakScreen('cases'); }); if(els.weakBackBtn) els.weakBackBtn.addEventListener('click', backSubject); if(els.weakHomeBtn) els.weakHomeBtn.addEventListener('click', resetHome);
   els.practiceRandomBtn.addEventListener('click', function(){ startPracticeCase(null); }); els.practiceBackBtn.addEventListener('click', hidePracticePicker);
   var _resetBtn=document.getElementById('resetSubjectProgressBtn'); if(_resetBtn) _resetBtn.addEventListener('click', function(){ var short=state.progressSubject || (state.subject&&state.subject.short); if(!short) return; if(window.confirm('¿Seguro que quieres borrar todo el registro de '+subjectDisplayByShort(short)+'? Esta acción no se puede deshacer.')) resetSubjectProgress(short); });
-  els.homeTopBtn.addEventListener('click', resetHome); els.homeBtn.addEventListener('click', resetHome); els.subjectBtn.addEventListener('click', backSubject); els.repeatBtn.addEventListener('click', function(){ startMode(state.mode); }); els.nextBtn.addEventListener('click', nextQuestion); els.exitBtn.addEventListener('click', function(){ if(window.confirm('¿Salir de la sesión? Perderás el progreso actual.')) resetHome(); }); els.themeBtn.addEventListener('click', toggleTheme); els.shareQuestionBtn.addEventListener('click', function(){ var txt=buildQuestionShareText(); if(txt) shareText(txt); }); els.shareActivityBtn.addEventListener('click', function(){ var txt=buildActivityShareText(); if(txt) shareText(txt); }); els.appHelpBtn.addEventListener('click', function(){ showScreen('help'); }); els.helpBackBtn.addEventListener('click', resetHome); els.toggleInfoBtn.addEventListener('click', function(){ els.sectionTag.style.display = els.sectionTag.style.display==='none' ? 'block' : 'none'; });
+  els.homeTopBtn.addEventListener('click', goBack); els.homeBtn.addEventListener('click', resetHome); els.subjectBtn.addEventListener('click', backSubject); els.repeatBtn.addEventListener('click', function(){ startMode(state.mode); }); els.nextBtn.addEventListener('click', nextQuestion); els.exitBtn.addEventListener('click', function(){ if(window.confirm('¿Salir de la sesión? Perderás el progreso actual.')) resetHome(); }); els.themeBtn.addEventListener('click', toggleTheme); els.shareQuestionBtn.addEventListener('click', function(){ var txt=buildQuestionShareText(); if(txt) shareText(txt); }); els.shareActivityBtn.addEventListener('click', function(){ var txt=buildActivityShareText(); if(txt) shareText(txt); }); els.appHelpBtn.addEventListener('click', function(){ showScreen('help'); }); els.helpBackBtn.addEventListener('click', resetHome); els.toggleInfoBtn.addEventListener('click', function(){ els.sectionTag.style.display = els.sectionTag.style.display==='none' ? 'block' : 'none'; });
   els.shareRegistryTopBtn.addEventListener('click', function(){ if(!state.progressSubject){ state.progressSubject=(state.subject && state.subject.short) ? state.subject.short : (getAvailableSubjects()[0] ? getAvailableSubjects()[0].short : 'PIICT'); } showScreen('share'); renderShareScreen(); });
   bindProgressChartChips();
   var _shareBack=document.getElementById('shareBackBtn'); if(_shareBack) _shareBack.addEventListener('click', function(){ renderProgress(); });
