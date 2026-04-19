@@ -4425,11 +4425,14 @@ init();
     hide();
   });
   if(loginBtn) loginBtn.addEventListener('click', function(){
-    hide();
     try{
-      if(typeof signInWithGoogle==='function'){ signInWithGoogle(); return; }
+      if(typeof signInWithGoogle==='function'){
+        signInWithGoogle();
+        return;
+      }
     }catch(e){}
-    // Fallback: pulsa el botón de login del header
+    hide();
+    // Fallback solo si no existe la función directa de login
     var hdr=document.getElementById('googleLoginBtn')||document.getElementById('loginBtn');
     if(hdr) hdr.click();
   });
