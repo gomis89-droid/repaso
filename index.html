@@ -2377,6 +2377,7 @@ async function signInWithGoogle(){
     alert('No se pudo iniciar sesión con Google.');
   }
 }
+window.signInWithGoogle = signInWithGoogle;
 async function signOutGoogle(){
   if(!auth) return;
   var ok=window.confirm('¿Quieres cerrar la sesión de Google en esta app?');
