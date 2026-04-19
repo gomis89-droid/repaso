@@ -828,6 +828,14 @@ textarea.share-preview:focus{outline:none;border-color:var(--p3)}
 .btn.small{padding:8px 13px;font-size:13px}
 @media(max-width:640px){
   .tb-actions{flex-wrap:wrap;justify-content:flex-end;gap:4px}
+  /* En móvil los botones del encabezado muestran solo el icono */
+  .tb-actions .tb-label{display:none}
+  .tb-actions .btn.small{padding:8px 10px;font-size:15px;line-height:1}
+  .tb-actions .btn{padding:8px 10px}
+  /* Oculta el subtítulo largo del brand para dejar más espacio al título */
+  .brand-txt small{display:none}
+  .brand-txt h1{font-size:22px;line-height:1.05}
+  .brand-poo{font-size:30px}
 }
 @media(max-width:700px){
   .app{padding:12px 12px 80px}
@@ -1015,10 +1023,10 @@ body.quiz-active{}
     </div>
   </div>
   <div class="tb-actions toolbar">
-    <button class="btn ghost small" id="homeTopBtn" style="display:none;">&#x2190; Inicio</button>
-    <button class="btn ghost small" id="progressBtn">&#x1F4CA; Registro</button>
-    <button class="btn ghost small" id="syncTopBtn" title="Sincronizar progreso con la nube" aria-label="Sincronizar progreso">&#x21BB; Sincronizar</button>
-    <button class="btn ghost small" id="shareRegistryTopBtn" style="display:none;">&#x2197; Compartir</button>
+    <button class="btn ghost small" id="homeTopBtn" style="display:none;">&#x2190;<span class="tb-label"> Inicio</span></button>
+    <button class="btn ghost small" id="progressBtn">&#x1F4CA;<span class="tb-label"> Registro</span></button>
+    <button class="btn ghost small" id="syncTopBtn" title="Sincronizar progreso con la nube" aria-label="Sincronizar progreso">&#x21BB;<span class="tb-label"> Sincronizar</span></button>
+    <button class="btn ghost small" id="shareRegistryTopBtn" style="display:none;">&#x2197;<span class="tb-label"> Compartir</span></button>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Cambiar tema" title="Cambiar tema">&#x1F319;</button>
     <!-- authControls injected here by JS -->
   </div>
@@ -1946,7 +1954,9 @@ function updateAuthUi(){
   document.body.classList.toggle('auth-logged-in', !!state.authUser);
   document.body.classList.toggle('auth-logged-out', !state.authUser);
   els.authActionBtn.className='btn small '+(state.authUser ? 'danger' : 'auth-login-btn');
-  els.authActionBtn.textContent=state.authUser ? 'Cerrar sesión' : 'Login';
+  els.authActionBtn.innerHTML=state.authUser
+    ? '&#x1F6AA;<span class="tb-label"> Cerrar sesión</span>'
+    : '&#x1F511;<span class="tb-label"> Login</span>';
   if(state.authUser){
     els.authActionBtn.title=state.authUser.displayName || state.authUser.email || 'Sesión iniciada';
   }else if(!isFirebaseConfigured()){
@@ -2752,17 +2762,17 @@ function init(){ createAuthUi(); updateAuthUi(); setupFirebase(); applySavedThem
     if(!els.syncTopBtn) return;
     if(syncBtnOriginalHtml==='') syncBtnOriginalHtml=els.syncTopBtn.innerHTML;
     if(!authReady || !auth || !db){
-      els.syncTopBtn.innerHTML='&#x26A0; Firebase no listo';
+      els.syncTopBtn.innerHTML='&#x26A0;<span class="tb-label"> Firebase no listo</span>';
       setTimeout(function(){ els.syncTopBtn.innerHTML=syncBtnOriginalHtml; },2200);
       return;
     }
     if(!auth.currentUser){
-      els.syncTopBtn.innerHTML='&#x26A0; Inicia sesión con Google';
+      els.syncTopBtn.innerHTML='&#x26A0;<span class="tb-label"> Inicia sesión con Google</span>';
       setTimeout(function(){ els.syncTopBtn.innerHTML=syncBtnOriginalHtml; },2600);
       return;
     }
     els.syncTopBtn.disabled=true;
-    els.syncTopBtn.innerHTML='&#x21BB; Sincronizando...';
+    els.syncTopBtn.innerHTML='&#x21BB;<span class="tb-label"> Sincronizando...</span>';
     try{
       /* DIAG: capturar stats antes y después */
       function sumStats(store){
@@ -2789,14 +2799,14 @@ function init(){ createAuthUi(); updateAuthUi(); setupFirebase(); applySavedThem
       await applyCloudProgress(auth.currentUser);
       var afterLocal=sumStats(progressStore);
       console.log('[SYNC] Local después:', afterLocal);
-      els.syncTopBtn.innerHTML='&#x2705; '+afterLocal.sessions+'ses/'+afterLocal.answered+'resp';
+      els.syncTopBtn.innerHTML='&#x2705;<span class="tb-label"> '+afterLocal.sessions+'ses/'+afterLocal.answered+'resp</span>';
       /* Alerta visible para la tablet sin devtools */
       if(typeof window!=='undefined' && window.localStorage && window.localStorage.getItem('syncDebug')==='1'){
         alert('SYNC diag\n\nCuenta: '+auth.currentUser.email+'\n\nLocal antes: '+beforeLocal.sessions+' sesiones / '+beforeLocal.answered+' respuestas en '+beforeLocal.subjects+' asignaturas\n\nNube: '+cloudStats.sessions+' sesiones / '+cloudStats.answered+' respuestas en '+cloudStats.subjects+' asignaturas (doc existe: '+snap.exists+')\n\nLocal después: '+afterLocal.sessions+' sesiones / '+afterLocal.answered+' respuestas en '+afterLocal.subjects+' asignaturas');
       }
     }catch(e){
       console.error('Sync manual falló:',e);
-      els.syncTopBtn.innerHTML='&#x274C; Error';
+      els.syncTopBtn.innerHTML='&#x274C;<span class="tb-label"> Error</span>';
       alert('SYNC error: '+(e && e.message?e.message:e));
     }finally{
       setTimeout(function(){ els.syncTopBtn.disabled=false; els.syncTopBtn.innerHTML=syncBtnOriginalHtml; },1800);
