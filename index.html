@@ -4446,6 +4446,14 @@ init();
     try{ localStorage.setItem('wmNever','1'); }catch(e){}
   });
 
+  try{
+    if(window.firebase && firebase.auth){
+      firebase.auth().onAuthStateChanged(function(user){
+        if(user) hide();
+      });
+    }
+  }catch(e){}
+
   // Mostrar al arrancar, con un retardo para que Firebase pueda decidir el authState
   window.addEventListener('load', function(){
     setTimeout(function(){
