@@ -476,26 +476,116 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:800;letter-spacing:-0.02
    =================================================================== */
 .controls-row{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:10px}
 .btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:11px 18px;border-radius:14px;font-weight:700;font-size:14px;
-  background:var(--card);color:var(--ink);
-  border:1px solid var(--line-2);
-  transition:transform .15s,box-shadow .2s,background .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:46px;
+  padding:11px 18px;border-radius:18px;font-weight:700;font-size:14px;line-height:1.15;
+  background:
+    linear-gradient(180deg,color-mix(in oklab,var(--paper-2) 32%,transparent),transparent) padding-box,
+    linear-gradient(135deg,color-mix(in oklab,var(--p3) 34%,transparent),color-mix(in oklab,var(--p4) 24%,transparent)) border-box;
+  color:var(--ink);
+  border:1px solid transparent;
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.08),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  transition:
+    transform .18s cubic-bezier(.2,.9,.3,1),
+    box-shadow .25s ease,
+    border-color .22s ease,
+    background .22s ease,
+    color .22s ease,
+    filter .22s ease;
   font-family:var(--font-sans);
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
 }
-.btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.08)}
-.btn:active{transform:translateY(0)}
+.btn::before{
+  content:"";
+  position:absolute;inset:1px;
+  border-radius:inherit;
+  background:
+    radial-gradient(circle at 18% 18%,color-mix(in oklab,var(--p1) 18%,transparent),transparent 42%),
+    linear-gradient(180deg,color-mix(in oklab,var(--paper-2) 18%,var(--card)),color-mix(in oklab,var(--paper) 4%,var(--card)));
+  opacity:1;
+  pointer-events:none;
+  z-index:-1;
+}
+.btn:hover{
+  transform:translateY(-2px) scale(1.01);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.12),
+    0 0 0 1px color-mix(in oklab,var(--p3) 26%,transparent);
+}
+.btn:active{
+  transform:translateY(0) scale(.985);
+  box-shadow:
+    0 8px 16px rgba(0,0,0,.09),
+    0 0 0 1px color-mix(in oklab,var(--p3) 18%,transparent);
+}
+.btn:focus-visible{
+  outline:none;
+  box-shadow:
+    0 0 0 3px color-mix(in oklab,var(--paper) 74%,transparent),
+    0 0 0 6px color-mix(in oklab,var(--p3) 32%,transparent),
+    0 14px 28px rgba(0,0,0,.1);
+}
 .btn.primary{
-  background:linear-gradient(135deg,var(--p1),var(--p3));color:#fff;border:none;
-  box-shadow:0 4px 14px color-mix(in oklab,var(--p1) 40%,transparent);
+  color:#fff;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.24),transparent 44%) padding-box,
+    linear-gradient(135deg,var(--p1),var(--p3) 58%,var(--p4)) border-box;
+  border:1px solid transparent;
+  box-shadow:
+    0 14px 28px color-mix(in oklab,var(--p3) 28%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.26);
 }
-.btn.primary:hover{box-shadow:0 8px 22px color-mix(in oklab,var(--p1) 50%,transparent)}
-.btn.ghost{background:transparent}
-.btn.danger{color:var(--bad);border-color:color-mix(in oklab,var(--bad) 30%,transparent)}
-.btn:disabled{opacity:.45;pointer-events:none}
+.btn.primary:hover{
+  box-shadow:
+    0 18px 34px color-mix(in oklab,var(--p3) 36%,transparent),
+    inset 0 1px 0 rgba(255,255,255,.3);
+  filter:saturate(1.06);
+}
+.btn.ghost{
+  color:var(--ink);
+  background:
+    linear-gradient(180deg,color-mix(in oklab,var(--paper-2) 24%,transparent),transparent) padding-box,
+    linear-gradient(135deg,color-mix(in oklab,var(--p1) 26%,transparent),color-mix(in oklab,var(--p3) 26%,transparent),color-mix(in oklab,var(--p4) 20%,transparent)) border-box;
+  border:1px solid transparent;
+}
+.btn.ghost:hover{
+  color:var(--ink);
+  box-shadow:
+    0 14px 26px rgba(0,0,0,.1),
+    0 0 0 1px color-mix(in oklab,var(--p3) 26%,transparent);
+}
+.btn.danger{
+  color:var(--bad);
+  background:
+    linear-gradient(180deg,color-mix(in oklab,var(--bad) 10%,transparent),transparent) padding-box,
+    linear-gradient(135deg,color-mix(in oklab,var(--bad) 44%,transparent),color-mix(in oklab,var(--p5) 28%,transparent)) border-box;
+  border:1px solid transparent;
+}
+.btn.danger:hover{
+  box-shadow:
+    0 14px 28px color-mix(in oklab,var(--bad) 18%,transparent),
+    0 0 0 1px color-mix(in oklab,var(--bad) 22%,transparent);
+}
+.btn:disabled{opacity:.45;pointer-events:none;filter:grayscale(.12)}
 
-.variant-bento .btn{border-radius:10px;border:1.5px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
-.variant-bento .btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.variant-bento .btn{
+  border-radius:14px;
+  border:1.5px solid var(--ink);
+  background:var(--card);
+  box-shadow:
+    5px 5px 0 var(--ink),
+    inset 0 1px 0 rgba(255,255,255,.55);
+}
+.variant-bento .btn::before{display:none}
+.variant-bento .btn:hover{
+  transform:translate(-2px,-2px);
+  box-shadow:7px 7px 0 var(--ink);
+}
+.variant-bento .btn:active{transform:translate(0,0);box-shadow:4px 4px 0 var(--ink)}
 .variant-bento .btn.primary{border:1.5px solid var(--ink);color:#fff}
 
 /* ===================================================================
@@ -700,10 +790,45 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:800;letter-spacing:-0.02
 .option.correct{border-color:var(--ok);background:color-mix(in oklab,var(--ok) 10%,var(--card));color:var(--ok);font-weight:700}
 .option.wrong{border-color:var(--bad);background:color-mix(in oklab,var(--bad) 10%,var(--card));color:var(--bad);font-weight:700;animation:shake .5s}
 .option:disabled{cursor:default;opacity:.6}
-.subject-switch{display:flex;gap:6px;flex-wrap:wrap}
-.subject-switch .btn.active{background:linear-gradient(135deg,var(--p1),var(--p3));color:#fff;border-color:transparent}
-.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 14px}
-.subfilter{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.subject-switch{
+  display:flex;gap:8px;flex-wrap:wrap;
+  padding:6px;
+  border-radius:24px;
+  background:color-mix(in oklab,var(--paper) 62%,var(--paper-2));
+  border:1px solid color-mix(in oklab,var(--p3) 18%,var(--line));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+}
+.subject-switch .btn.active{
+  background:linear-gradient(135deg,var(--p1),var(--p3) 58%,var(--p4));
+  color:#fff;border-color:transparent;
+  box-shadow:0 12px 24px color-mix(in oklab,var(--p3) 28%,transparent);
+}
+.subtabs,
+.subfilter{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin:10px 0 14px;
+  padding:6px;
+  border-radius:24px;
+  background:color-mix(in oklab,var(--paper) 66%,var(--paper-2));
+  border:1px solid color-mix(in oklab,var(--p3) 18%,var(--line));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 8px 22px rgba(0,0,0,.03);
+}
+.subtabs .btn,
+.subfilter .btn,
+.subject-switch .btn{
+  flex:0 0 auto;
+  min-height:42px;
+  border-radius:999px;
+}
+.subtabs .btn.active,
+.subfilter .btn.active{
+  background:linear-gradient(135deg,var(--p1),var(--p3) 58%,var(--p4));
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 12px 24px color-mix(in oklab,var(--p3) 28%,transparent);
+}
 .case-list{display:grid;gap:12px}
 .case-card{padding:18px;border:1px solid var(--line);border-radius:18px;background:var(--paper-2);cursor:pointer;transition:all .18s;text-align:left}
 .case-card:hover{transform:translateY(-2px);border-color:var(--p3);box-shadow:0 8px 24px rgba(0,0,0,.08)}
@@ -825,7 +950,12 @@ textarea.share-preview:focus{outline:none;border-color:var(--p3)}
 .prog-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:18px}
 .bignum{font-family:var(--font-display);font-size:48px;font-weight:800;line-height:1;letter-spacing:-.03em}
 .subtle{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
-.btn.small{padding:8px 13px;font-size:13px}
+.btn.small{
+  min-height:40px;
+  padding:8px 15px;
+  font-size:13px;
+  border-radius:999px;
+}
 @media(max-width:1024px){
   /* En móvil y tablet los botones del encabezado muestran solo el icono
      y se mantienen todos en una misma línea. */
@@ -881,9 +1011,30 @@ body.quiz-active{}
 .r-hero-chart .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .r-hero-chart h3{margin:0;font-size:17px;font-family:var(--font-display)}
 .r-hero-chart .chart-chips{display:flex;gap:6px;flex-wrap:wrap}
-.r-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:99px;border:1px solid var(--line);background:var(--paper-2);font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:all .15s}
-.r-chip:hover{border-color:var(--p3)}
-.r-chip.active{background:linear-gradient(90deg,var(--p1),var(--p3));border-color:transparent;color:#fff}
+.r-chip{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  min-height:34px;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid transparent;
+  background:
+    linear-gradient(180deg,color-mix(in oklab,var(--paper-2) 88%,white),color-mix(in oklab,var(--paper) 92%,var(--card))) padding-box,
+    linear-gradient(135deg,color-mix(in oklab,var(--p3) 18%,transparent),color-mix(in oklab,var(--p4) 14%,transparent)) border-box;
+  font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;
+  box-shadow:0 8px 16px rgba(0,0,0,.04), inset 0 1px 0 rgba(255,255,255,.55);
+  transition:transform .16s cubic-bezier(.2,.9,.3,1),box-shadow .2s ease,color .2s ease,filter .2s ease;
+}
+.r-chip:hover{
+  transform:translateY(-1px);
+  color:var(--ink);
+  box-shadow:0 12px 22px rgba(0,0,0,.06), 0 0 0 1px color-mix(in oklab,var(--p3) 22%,transparent);
+}
+.r-chip.active{
+  background:linear-gradient(90deg,var(--p1),var(--p3),var(--p4));
+  border-color:transparent;
+  color:#fff;
+  box-shadow:0 16px 28px color-mix(in oklab,var(--p3) 24%,transparent);
+}
 .r-sparkline{min-height:140px;background:var(--paper-2);border-radius:12px;padding:12px;position:relative}
 .r-sparkline.line-mode{height:140px}
 .r-sparkline.line-mode svg{width:100%;height:100%;display:block;overflow:visible}
@@ -1597,20 +1748,11 @@ function normalizeLegacyWeakQuestions(sub){
   return out;
 }
 function buildWeakQuestionMap(sub){
-  sub=sub||emptySubject();
-  var log=Array.isArray(sub.questionLog) ? sub.questionLog : [];
-  if(!log.length) return normalizeLegacyWeakQuestions(sub);
-  var out={};
-  for(var i=0;i<log.length;i++){
-    var entry=log[i]||{};
-    var key=(entry.section||'')+'||'+(entry.q||'');
-    if(!out[key]) out[key]={q:entry.q||'', wrong:0, correct:0, seen:0, section:entry.section||'', tag:entry.tag||''};
-    out[key].seen++;
-    if(entry.isCorrect) out[key].correct++;
-    else out[key].wrong++;
-    if(!out[key].tag && entry.tag) out[key].tag=entry.tag;
-  }
-  return out;
+  /* Usamos SIEMPRE el agregado weakQuestions (capado a nº de sesiones
+     en normalizeLegacyWeakQuestions). Antes reconstruíamos desde el log
+     crudo, pero el log se duplicaba al sincronizar entre dispositivos y
+     producía recuentos inflados (p. ej. 66 fallos de una sola pregunta). */
+  return normalizeLegacyWeakQuestions(sub||emptySubject());
 }
 function getWeakQuestionPool(data){ if(!state.subject) return []; var sub=progressStore[state.subject.short] || emptySubject(); var map=buildWeakQuestionMap(sub); var refs=[]; for(var k in map){ if(map[k] && (map[k].wrong||0)>0) refs.push(map[k]); } refs.sort(function(a,b){ return (b.wrong||0)-(a.wrong||0); }); var lookup=buildQuestionLookups(data), out=[], seen={}; for(var i=0;i<refs.length;i++){ var ref=refs[i]||{}; var exactKey=(ref.section||'')+'||'+(ref.q||''); var full=lookup.byExact[exactKey] || lookup.byQ[ref.q||'']; if(!full) continue; var cloned=cloneData(full); cloned.block='Bloque 1 — Más falladas'; var sig=questionSignature(cloned); if(seen[sig]) continue; seen[sig]=1; out.push(cloned); } return out; }
 function buildReviewOptionsHtml(item, selectedIndex, showSelectedWrong){ var html=''; if(!item || !item.options || !item.options.length) return html; for(var k=0;k<item.options.length;k++){ var cls='review-option'; var suffix=''; if(k===item.correct){ cls+=' correct'; suffix=' <strong>✓ Correcta</strong>'; } if(showSelectedWrong && typeof selectedIndex==='number' && selectedIndex===k && k!==item.correct){ cls+=' wrong'; suffix=' <strong>✗ Tu respuesta</strong>'; } html+='<div class="'+cls+'">'+escapeHtml(item.options[k])+suffix+'</div>'; } return html; }
@@ -2052,6 +2194,19 @@ function ensureProgressShape(obj){
     out.history=Array.isArray(src.history) ? src.history : [];
     out.weakQuestions=(src.weakQuestions && typeof src.weakQuestions==='object') ? src.weakQuestions : {};
     out.questionLog=Array.isArray(src.questionLog) ? src.questionLog : [];
+    /* Reparación: capa contadores inflados a nº de sesiones jugadas.
+       Arregla datos ya existentes con "66 fallos" por concatenación de logs. */
+    var cap=Math.max(1, Number(out.overall.sessions)||0);
+    for(var wk in out.weakQuestions){
+      var it=out.weakQuestions[wk]; if(!it || typeof it!=='object') continue;
+      if((it.wrong||0)>cap)   it.wrong=cap;
+      if((it.correct||0)>cap) it.correct=cap;
+      if((it.seen||0)>cap)    it.seen=cap;
+    }
+    /* Si el log es claramente inflado (más de 4× sesiones·30 preguntas),
+       lo descartamos para evitar que afecte a cálculos/diagnóstico. */
+    var expectedMax=cap*30*4;
+    if(out.questionLog.length>Math.max(800, expectedMax)) out.questionLog=out.questionLog.slice(0,400);
     safe[s.short]=out;
   }
   return safe;
@@ -2195,7 +2350,11 @@ function mergeProgressStores(localData, cloudData){
     if(!(pr && (!sr || pr>sr) && (!sl || pr>=sl))){
       merged[key].weakQuestions=mergeWeakQuestions(primary.weakQuestions, secondary.weakQuestions);
       merged[key].history=mergeHistory(primary.history, secondary.history);
-      merged[key].questionLog=((primary.questionLog||[]).concat(secondary.questionLog||[])).slice(0,2000);
+      /* El log NO se concatena: concatenarlo duplica eventos en cada sync
+         y no se puede deduplicar fiablemente (no hay id ni timestamp).
+         Mantenemos solo el log del lado elegido; el agregado weakQuestions
+         (que sí se fusiona con MAX) es la fuente de verdad para "falladas". */
+      merged[key].questionLog=(primary.questionLog||[]).slice(0,2000);
     }
   }
   return ensureProgressShape(merged);
