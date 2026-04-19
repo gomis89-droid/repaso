@@ -2054,9 +2054,20 @@ function subjectResetAt(sub){
 }
 function mergeWeakQuestions(a,b){
   a=a||{}; b=b||{};
-  var hasA=false, k;
-  for(k in a){ if(Object.prototype.hasOwnProperty.call(a,k)){ hasA=true; break; } }
-  return cloneData(hasA ? a : b);
+  var out={}, k;
+  for(k in a){ if(Object.prototype.hasOwnProperty.call(a,k)){ out[k]=cloneData(a[k]); } }
+  for(k in b){
+    if(!Object.prototype.hasOwnProperty.call(b,k)) continue;
+    if(!out[k]){ out[k]=cloneData(b[k]); continue; }
+    /* Fusión real: MAX de cada contador (son monotónicos crecientes) */
+    out[k].wrong   = Math.max((out[k].wrong||0),   (b[k].wrong||0));
+    out[k].correct = Math.max((out[k].correct||0), (b[k].correct||0));
+    out[k].seen    = Math.max((out[k].seen||0),    (b[k].seen||0));
+    if(!out[k].q && b[k].q) out[k].q=b[k].q;
+    if(!out[k].section && b[k].section) out[k].section=b[k].section;
+    if(!out[k].tag && b[k].tag) out[k].tag=b[k].tag;
+  }
+  return out;
 }
 
 function mergeHistory(a,b){
@@ -2082,10 +2093,18 @@ function mergeProgressStores(localData, cloudData){
     var pickCloud=false;
     var ll=subjectLastPlayed(ls), cl=subjectLastPlayed(cs);
     var lr=subjectResetAt(ls), cr=subjectResetAt(cs);
+    /* 1) Reset reciente siempre gana */
     if(cr && (!lr || cr>lr) && (!ll || cr>=ll)) pickCloud=true;
     else if(lr && (!cr || lr>cr) && (!cl || lr>=cl)) pickCloud=false;
-    else if(cl && (!ll || cl>ll)) pickCloud=true;
-    else if(ll===cl && subjectWeight(cs)>subjectWeight(ls)) pickCloud=true;
+    else {
+      /* 2) NUEVO: el lado con más preguntas respondidas gana (contador monotónico; nunca baja) */
+      var la=((ls.overall||{}).answered||0), ca=((cs.overall||{}).answered||0);
+      if(ca > la) pickCloud=true;
+      else if(la > ca) pickCloud=false;
+      /* 3) Empate en answered → usar lastPlayed y peso como desempates (lógica antigua) */
+      else if(cl && (!ll || cl>ll)) pickCloud=true;
+      else if(ll===cl && subjectWeight(cs)>subjectWeight(ls)) pickCloud=true;
+    }
     var primary=pickCloud?cs:ls;
     var secondary=pickCloud?ls:cs;
     var pr=subjectResetAt(primary), sr=subjectResetAt(secondary), sl=subjectLastPlayed(secondary);
