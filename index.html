@@ -2031,13 +2031,41 @@ async function saveProgressToCloud(force){
   cloudSyncInFlight=true;
 
   try{
-    await db.collection('progress').doc(auth.currentUser.uid).set({
-      version:CLOUD_DOC_VERSION,
-      updatedAt:new Date().toISOString(),
-      progress:ensureProgressShape(cloneData(progressStore||{}))
-    }, {merge:true});
+    var payload=ensureProgressShape(cloneData(progressStore||{}));
+    // Compactar: Firestore limita cada documento a 1 MB. El questionLog crudo
+    // puede crecer mucho (>1 MB con varias asignaturas). Antes de subir:
+    //  - Consolidamos los agregados en weakQuestions (para que otra instalación
+    //    pueda reconstruir la lista de "más falladas" sin el log).
+    //  - Recortamos questionLog a los últimos N eventos por asignatura.
+    //  - Recortamos history a los últimos 100 resultados.
+    var LOG_CAP=400, HIST_CAP=100;
+    for(var sk in payload){
+      if(!Object.prototype.hasOwnProperty.call(payload,sk)) continue;
+      var sub=payload[sk]; if(!sub || typeof sub!=='object') continue;
+      try{ sub.weakQuestions=buildWeakQuestionMap(sub); }catch(_){}
+      if(Array.isArray(sub.questionLog) && sub.questionLog.length>LOG_CAP){
+        sub.questionLog=sub.questionLog.slice(0, LOG_CAP);
+      }
+      if(Array.isArray(sub.history) && sub.history.length>HIST_CAP){
+        sub.history=sub.history.slice(0, HIST_CAP);
+      }
+    }
+    // Medimos tamaño. Si aun así supera el límite, tiramos el log completo.
+    var body={ version:CLOUD_DOC_VERSION, updatedAt:new Date().toISOString(), progress:payload };
+    var approxSize=0;
+    try{ approxSize=JSON.stringify(body).length; }catch(_){}
+    if(approxSize>900000){
+      for(var sk2 in payload){
+        if(!Object.prototype.hasOwnProperty.call(payload,sk2)) continue;
+        if(payload[sk2]) payload[sk2].questionLog=[];
+      }
+      try{ approxSize=JSON.stringify(body).length; }catch(_){}
+      console.warn('[SYNC] Payload grande, log eliminado antes de subir. Tamaño:', approxSize);
+    }
+    await db.collection('progress').doc(auth.currentUser.uid).set(body, {merge:true});
   }catch(e){
     console.error('No se pudo guardar el progreso en la nube:', e);
+    try{ if(window.localStorage.getItem('syncDebug')==='1') alert('Error al subir progreso:\n'+(e && e.message ? e.message : e)); }catch(_){}
   }finally{
     cloudSyncInFlight=false;
   }
@@ -2735,12 +2763,40 @@ function init(){ createAuthUi(); updateAuthUi(); setupFirebase(); applySavedThem
     els.syncTopBtn.disabled=true;
     els.syncTopBtn.innerHTML='&#x21BB; Sincronizando...';
     try{
+      /* DIAG: capturar stats antes y después */
+      function sumStats(store){
+        var s={sessions:0, answered:0, subjects:0};
+        if(!store) return s;
+        for(var k in store){
+          if(!Object.prototype.hasOwnProperty.call(store,k)) continue;
+          var sub=store[k]||{}; var ov=sub.overall||{};
+          if((ov.answered||0)>0 || (ov.sessions||0)>0) s.subjects++;
+          s.sessions += (ov.sessions||0);
+          s.answered += (ov.answered||0);
+        }
+        return s;
+      }
+      var beforeLocal=sumStats(progressStore);
+      console.log('[SYNC] Local antes:', beforeLocal, 'user:', auth.currentUser.email, 'uid:', auth.currentUser.uid);
       await saveProgressToCloud(true);
+      console.log('[SYNC] saveProgressToCloud done');
+      /* Leer directamente la nube para diagnóstico */
+      var snap=await db.collection('progress').doc(auth.currentUser.uid).get();
+      var cloudData=(snap.exists && snap.data() && snap.data().progress) || {};
+      var cloudStats=sumStats(cloudData);
+      console.log('[SYNC] Nube leída:', cloudStats, 'existe doc:', snap.exists);
       await applyCloudProgress(auth.currentUser);
-      els.syncTopBtn.innerHTML='&#x2705; Sincronizado';
+      var afterLocal=sumStats(progressStore);
+      console.log('[SYNC] Local después:', afterLocal);
+      els.syncTopBtn.innerHTML='&#x2705; '+afterLocal.sessions+'ses/'+afterLocal.answered+'resp';
+      /* Alerta visible para la tablet sin devtools */
+      if(typeof window!=='undefined' && window.localStorage && window.localStorage.getItem('syncDebug')==='1'){
+        alert('SYNC diag\n\nCuenta: '+auth.currentUser.email+'\n\nLocal antes: '+beforeLocal.sessions+' sesiones / '+beforeLocal.answered+' respuestas en '+beforeLocal.subjects+' asignaturas\n\nNube: '+cloudStats.sessions+' sesiones / '+cloudStats.answered+' respuestas en '+cloudStats.subjects+' asignaturas (doc existe: '+snap.exists+')\n\nLocal después: '+afterLocal.sessions+' sesiones / '+afterLocal.answered+' respuestas en '+afterLocal.subjects+' asignaturas');
+      }
     }catch(e){
       console.error('Sync manual falló:',e);
       els.syncTopBtn.innerHTML='&#x274C; Error';
+      alert('SYNC error: '+(e && e.message?e.message:e));
     }finally{
       setTimeout(function(){ els.syncTopBtn.disabled=false; els.syncTopBtn.innerHTML=syncBtnOriginalHtml; },1800);
     }
