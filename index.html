@@ -3388,7 +3388,8 @@ init();
   var GUEST_STARTED_KEY = 'tsei_guest_started_at';
   var GUEST_PING_MS = 45*1000;          /* 45 s */
   var GUEST_ACTIVE_WINDOW_MS = 90*1000; /* 90 s */
-  var guestTracker = {active:false, interval:null, visitorId:'', sessionId:'', startedAt:'', listenersBound:false};
+  var GUEST_INTERACTION_WINDOW_MS = 5*60*1000; /* 5 min */
+  var guestTracker = {active:false, interval:null, visitorId:'', sessionId:'', startedAt:'', listenersBound:false, lastInteractionAt:0};
   var quotaTracker = {pending:0, timer:null, flushing:false, listenersBound:false};
 
   /* ── guardar meta de usuario y registrar conexión ── */
@@ -3448,6 +3449,14 @@ init();
     var base=startedAt?new Date(startedAt).getTime():Date.now();
     var diff=Date.now()-base;
     return diff>0?diff:0;
+  }
+  function markGuestInteraction(){
+    guestTracker.lastInteractionAt=Date.now();
+  }
+  function guestShouldPing(){
+    if(document.visibilityState!=='visible') return false;
+    if(!guestTracker.lastInteractionAt) return true;
+    return (Date.now()-guestTracker.lastInteractionAt)<GUEST_INTERACTION_WINDOW_MS;
   }
 
   function getPacificDateParts(date){
@@ -3587,6 +3596,7 @@ init();
   }
   function recordGuestConnection(forceInactive){
     if(!window.db) return;
+    if(!forceInactive && !guestShouldPing()) return;
     try{
       var authInst=(window.firebase && window.firebase.auth) ? window.firebase.auth() : null;
       if(authInst && authInst.currentUser) return;
@@ -3640,11 +3650,17 @@ init();
   function bindGuestListeners(){
     if(guestTracker.listenersBound) return;
     guestTracker.listenersBound=true;
+    ['pointerdown','keydown','touchstart','scroll'].forEach(function(evt){
+      window.addEventListener(evt, markGuestInteraction, {passive:true});
+    });
     window.addEventListener('visibilitychange',function(){
-      if(document.visibilityState==='visible') recordGuestConnection(false);
+      if(document.visibilityState==='visible'){
+        markGuestInteraction();
+        recordGuestConnection(false);
+      }
       else recordGuestConnection(true);
     });
-    window.addEventListener('focus',function(){ recordGuestConnection(false); });
+    window.addEventListener('focus',function(){ markGuestInteraction(); recordGuestConnection(false); });
     window.addEventListener('pagehide',function(){ recordGuestConnection(true); });
     window.addEventListener('beforeunload',function(){ recordGuestConnection(true); });
   }
@@ -3652,8 +3668,11 @@ init();
     if(guestTracker.active) return;
     guestTracker.active=true;
     bindGuestListeners();
+    markGuestInteraction();
     recordGuestConnection(false);
-    guestTracker.interval=setInterval(function(){ recordGuestConnection(false); },GUEST_PING_MS);
+    guestTracker.interval=setInterval(function(){
+      if(guestShouldPing()) recordGuestConnection(false);
+    },GUEST_PING_MS);
   }
   function stopGuestTracking(skipFinalWrite){
     if(guestTracker.interval){ clearInterval(guestTracker.interval); guestTracker.interval=null; }
