@@ -4357,7 +4357,7 @@ init();
         +'<div class="a-kpis">'
         +'<div class="a-kpi hl"><div class="l">Sesiones invitado</div><div class="v">'+visibleCount+'</div><div class="s">Sin Gmail · últimos 100</div></div>'
         +'<div class="a-kpi"><div class="l">Invitados únicos</div><div class="v">'+uniqCount+'</div><div class="s">Calculado por visitorId</div></div>'
-        +'<div class="a-kpi"><div class="l">Activos ahora</div><div class="v">'+activeNow+'</div><div class="s">Última señal &lt; 1.5 min</div></div>'
+        +'<div class="a-kpi"><div class="l">Activos recientes</div><div class="v">'+activeNow+'</div><div class="s">Última señal &lt; 1.5 min</div></div>'
         +'<div class="a-kpi"><div class="l">Duración media</div><div class="v" style="font-size:22px;">'+esc(avgDuration)+'</div><div class="s">Tiempo abierto estimado</div></div>'
         +'</div>';
       if(!visibleCount){
@@ -4372,7 +4372,7 @@ init();
             var e=entries[ei]||{};
             var started=e.startedAt||'';
             var active=guestIsActive(e.lastSeen||started);
-            var pill=active?'<span class="c-pill live">● Activo</span>':'<span class="c-pill muted">Inactivo</span>';
+            var pill=active?'<span class="c-pill live">● Reciente</span>':'<span class="c-pill muted">Sin señal reciente</span>';
             var name=e.displayName||guestNameFromId(e.visitorId||'');
             var vid=e.visitorId||'—';
             var tStart=started?started.slice(11,16):'--:--';
@@ -4437,7 +4437,7 @@ init();
   document.head.appendChild(activeStyle);
   var activeCounter=document.createElement('div');
   activeCounter.id='adminActiveCounter';
-  activeCounter.innerHTML='<span class="dot"></span><span class="num">0</span><span class="lbl">activos</span>';
+  activeCounter.innerHTML='<span class="dot"></span><span class="num">0</span><span class="lbl">recientes</span>';
   activeCounter.title='Cargando...';
   document.body.appendChild(activeCounter);
 
@@ -4468,7 +4468,7 @@ init();
       var total=nGmail+nGuest;
       activeCounter.querySelector('.num').textContent=total;
       activeCounter.classList.toggle('zero',total===0);
-      activeCounter.title=total+' activos en últimos 1.5 min · '+nGmail+' con Gmail · '+nGuest+' invitado'+(nGuest===1?'':'s');
+      activeCounter.title=total+' activos recientes en últimos 1.5 min · '+nGmail+' con Gmail · '+nGuest+' invitado'+(nGuest===1?'':'s');
     }catch(e){
       try{ console.warn('ACTIVE_COUNTER_ERR',e); }catch(_){}
     }
