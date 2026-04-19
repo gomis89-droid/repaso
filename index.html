@@ -4302,6 +4302,7 @@ init();
 #welcomeModal button{font:inherit;cursor:pointer;border:none;padding:12px 16px;border-radius:12px;font-weight:700;font-size:14px;transition:transform .1s, filter .15s;}
 #welcomeModal button:hover{filter:brightness(1.1);}
 #welcomeModal button:active{transform:scale(.98);}
+#welcomeModal button:disabled{cursor:default;opacity:.7;filter:none;}
 #welcomeModal .wm-primary{background:linear-gradient(90deg,#ff7a45,#a855f7);color:#fff;}
 #welcomeModal .wm-secondary{background:rgba(255,255,255,.08);color:#f4f0ff;border:1px solid rgba(255,255,255,.12);}
 #welcomeModal .wm-ghost{background:transparent;color:#9b92c4;font-size:12px;padding:6px;}
@@ -4382,6 +4383,7 @@ init();
   var neverBtn=document.getElementById('wmNeverBtn');
   var desc=document.getElementById('wmDesc');
   var deferredPrompt=null;
+  var loginBtnDefaultHtml=loginBtn ? loginBtn.innerHTML : '';
 
   // Capturar evento de instalación (Chrome/Edge/Android)
   window.addEventListener('beforeinstallprompt', function(e){
@@ -4396,6 +4398,14 @@ init();
   }
   function isLoggedIn(){
     try{ return !!(window.firebase && firebase.auth && firebase.auth().currentUser); }catch(e){ return false; }
+  }
+  function setLoginPending(isPending){
+    if(!loginBtn) return;
+    loginBtn.disabled=!!isPending;
+    if(laterBtn) laterBtn.disabled=!!isPending;
+    if(neverBtn) neverBtn.disabled=!!isPending;
+    if(installBtn && installBtn.style.display!=='none') installBtn.disabled=!!isPending;
+    loginBtn.innerHTML=isPending ? '⏳ Abriendo inicio de sesión...' : loginBtnDefaultHtml;
   }
   function hide(){ if(modal) modal.classList.remove('show'); }
   function show(){
@@ -4428,10 +4438,12 @@ init();
   if(loginBtn) loginBtn.addEventListener('click', function(){
     try{
       if(typeof signInWithGoogle==='function'){
+        setLoginPending(true);
         signInWithGoogle();
         return;
       }
     }catch(e){}
+    setLoginPending(false);
     hide();
     // Fallback solo si no existe la función directa de login
     var hdr=document.getElementById('googleLoginBtn')||document.getElementById('loginBtn');
@@ -4449,7 +4461,12 @@ init();
   try{
     if(window.firebase && firebase.auth){
       firebase.auth().onAuthStateChanged(function(user){
-        if(user) hide();
+        if(user){
+          setLoginPending(false);
+          hide();
+        }else{
+          setLoginPending(false);
+        }
       });
     }
   }catch(e){}
