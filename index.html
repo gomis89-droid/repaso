@@ -1679,7 +1679,6 @@ body.quiz-active{}
       </div>
     </div>
     <div class="schedule-grid" id="examScheduleGrid"></div>
-    <div class="schedule-note">Los módulos con distinto número de preguntas comparten tramo según el horario original. Si más adelante quieres, puedo añadir aquí también el peso de cada asignatura en formato aún más visual o marcar tus asignaturas favoritas.</div>
   </div>
 </div>
 
@@ -3387,6 +3386,8 @@ init();
   var GUEST_VISITOR_KEY = 'tsei_guest_visitor_id';
   var GUEST_SESSION_KEY = 'tsei_guest_session_id';
   var GUEST_STARTED_KEY = 'tsei_guest_started_at';
+  var GUEST_PING_MS = 45*1000;          /* 45 s */
+  var GUEST_ACTIVE_WINDOW_MS = 90*1000; /* 90 s */
   var guestTracker = {active:false, interval:null, visitorId:'', sessionId:'', startedAt:'', listenersBound:false};
   var quotaTracker = {pending:0, timer:null, flushing:false, listenersBound:false};
 
@@ -3652,7 +3653,7 @@ init();
     guestTracker.active=true;
     bindGuestListeners();
     recordGuestConnection(false);
-    guestTracker.interval=setInterval(function(){ recordGuestConnection(false); },180000);
+    guestTracker.interval=setInterval(function(){ recordGuestConnection(false); },GUEST_PING_MS);
   }
   function stopGuestTracking(skipFinalWrite){
     if(guestTracker.interval){ clearInterval(guestTracker.interval); guestTracker.interval=null; }
@@ -4014,7 +4015,7 @@ init();
   }
   function guestIsActive(lastSeen){
     if(!lastSeen) return false;
-    return (Date.now()-new Date(lastSeen).getTime())<60000;
+    return (Date.now()-new Date(lastSeen).getTime())<GUEST_ACTIVE_WINDOW_MS;
   }
 
   function subjectStats(prog, subKey){
@@ -4337,7 +4338,7 @@ init();
         +'<div class="a-kpis">'
         +'<div class="a-kpi hl"><div class="l">Sesiones invitado</div><div class="v">'+visibleCount+'</div><div class="s">Sin Gmail · últimos 100</div></div>'
         +'<div class="a-kpi"><div class="l">Invitados únicos</div><div class="v">'+uniqCount+'</div><div class="s">Calculado por visitorId</div></div>'
-        +'<div class="a-kpi"><div class="l">Activos ahora</div><div class="v">'+activeNow+'</div><div class="s">Ping reciente</div></div>'
+        +'<div class="a-kpi"><div class="l">Activos ahora</div><div class="v">'+activeNow+'</div><div class="s">Última señal &lt; 1.5 min</div></div>'
         +'<div class="a-kpi"><div class="l">Duración media</div><div class="v" style="font-size:22px;">'+esc(avgDuration)+'</div><div class="s">Tiempo abierto estimado</div></div>'
         +'</div>';
       if(!visibleCount){
@@ -4359,7 +4360,7 @@ init();
             var tLast=e.lastSeen?e.lastSeen.slice(11,16):'--:--';
             /* Estimación: 1 escritura al iniciar + 1 ping cada 30s + 1 al cerrar */
             var durMs=Number(e.durationMs||0);
-            var writes=1+Math.round(durMs/30000)+1;
+            var writes=1+Math.round(durMs/GUEST_PING_MS)+1;
             var pctNum=writes/20000*100;
             var fbPct=(pctNum<0.01?'<0.01':pctNum.toFixed(2))+'%';
             var fbCls=pctNum>=1?'fb-chip warn':'fb-chip';
@@ -4421,7 +4422,7 @@ init();
   activeCounter.title='Cargando...';
   document.body.appendChild(activeCounter);
 
-  var ACTIVE_WINDOW_MS=2*60*1000; /* 2 min */
+  var ACTIVE_WINDOW_MS=GUEST_ACTIVE_WINDOW_MS; /* misma ventana que invitados */
   var ACTIVE_POLL_MS=75*1000;     /* 75 s */
   var activeTimer=null;
   async function refreshActiveCounter(){
@@ -4448,7 +4449,7 @@ init();
       var total=nGmail+nGuest;
       activeCounter.querySelector('.num').textContent=total;
       activeCounter.classList.toggle('zero',total===0);
-      activeCounter.title=total+' activos en últimos 2 min · '+nGmail+' con Gmail · '+nGuest+' invitado'+(nGuest===1?'':'s');
+      activeCounter.title=total+' activos en últimos 1.5 min · '+nGmail+' con Gmail · '+nGuest+' invitado'+(nGuest===1?'':'s');
     }catch(e){
       try{ console.warn('ACTIVE_COUNTER_ERR',e); }catch(_){}
     }
