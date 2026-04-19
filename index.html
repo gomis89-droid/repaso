@@ -4447,10 +4447,15 @@ init();
 
   // Mostrar al arrancar, con un retardo para que Firebase pueda decidir el authState
   window.addEventListener('load', function(){
-    try{ if(localStorage.getItem('wmNever')==='1') return; }catch(e){}
-    try{ if(sessionStorage.getItem('wmDismissed')==='1') return; }catch(e){}
     setTimeout(function(){
-      if(!isStandalone() || !isLoggedIn()) show();
+      var loggedIn=isLoggedIn();
+      if(!loggedIn){
+        show();
+        return;
+      }
+      try{ if(localStorage.getItem('wmNever')==='1') return; }catch(e){}
+      try{ if(sessionStorage.getItem('wmDismissed')==='1') return; }catch(e){}
+      if(!isStandalone()) show();
     }, 1500);
   });
 })();
