@@ -887,6 +887,18 @@ button.hero-chip:focus-visible{
 /* pulse glow on active streak */
 .glow-ok{box-shadow:0 0 0 0 var(--ok);animation:pulseOk 1.2s}
 @keyframes pulseOk{0%{box-shadow:0 0 0 0 color-mix(in oklab,var(--ok) 60%,transparent)}100%{box-shadow:0 0 0 24px transparent}}
+/* ── Sync button animations ── */
+@keyframes syncSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes checkDraw{from{stroke-dashoffset:30}to{stroke-dashoffset:0}}
+@keyframes syncSuccess{0%{transform:scale(1)}40%{transform:scale(1.2)}70%{transform:scale(.92)}100%{transform:scale(1)}}
+#syncTopBtn .sync-icon{display:inline-flex;align-items:center;vertical-align:middle;margin-right:3px}
+#syncTopBtn .sync-icon svg{display:none;overflow:visible}
+#syncTopBtn.state-idle .icon-arrow{display:block}
+#syncTopBtn.state-syncing .icon-arrow{display:block;animation:syncSpin .8s linear infinite}
+#syncTopBtn.state-ok .icon-check{display:block;animation:syncSuccess .4s ease}
+#syncTopBtn.state-ok .icon-check polyline{stroke-dasharray:30;stroke-dashoffset:30;animation:checkDraw .35s .05s ease forwards}
+#syncTopBtn.state-error .icon-x{display:block}
+#syncTopBtn.state-warn .icon-warn{display:block}
 /* =========================================================
    COMPATIBILITY LAYER — original JS class names → new design
    ========================================================= */
@@ -1296,7 +1308,7 @@ body.quiz-active{}
   <div class="tb-actions toolbar">
     <button class="btn ghost small" id="homeTopBtn" style="display:none;" title="Volver atrás" aria-label="Volver atrás">&#x2190;<span class="tb-label"> Atrás</span></button>
     <button class="btn ghost small" id="progressBtn">&#x1F4CA;<span class="tb-label"> Registro</span></button>
-    <button class="btn ghost small" id="syncTopBtn" title="Sincronizar progreso con la nube" aria-label="Sincronizar progreso">&#x21BB;<span class="tb-label"> Sincronizar</span></button>
+    <button class="btn ghost small state-idle" id="syncTopBtn" title="Sincronizar progreso con la nube" aria-label="Sincronizar progreso"><span class="sync-icon" aria-hidden="true"><svg class="icon-arrow" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><svg class="icon-check" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><svg class="icon-x" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><svg class="icon-warn" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><span class="tb-label sync-label"> Sincronizar</span></button>
     <button class="btn ghost small" id="shareRegistryTopBtn" style="display:none;">&#x2197;<span class="tb-label"> Compartir</span></button>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Cambiar tema" title="Cambiar tema">&#x1F319;</button>
     <!-- authControls injected here by JS -->
@@ -2626,7 +2638,7 @@ function setupFirebase(){
 }
 
 function emptyMode(){ return {sessions:0, answered:0, correct:0, wrong:0, blank:0, totalTimeMs:0, totalScore:0, bestScore:null, lastScore:null}; }
-function emptySubject(){ return { overall:{sessions:0, answered:0, correct:0, wrong:0, blank:0, totalTimeMs:0, days:{}, lastPlayed:null, resetAt:null}, modes:{cuestionario:emptyMode(), practicas:emptyMode(), examen:emptyMode(), examen1:emptyMode(), examenTotal:emptyMode()}, history:[], weakQuestions:{}, questionLog:[] }; }
+function emptySubject(){ return { overall:{sessions:0, answered:0, correct:0, wrong:0, blank:0, totalTimeMs:0, days:{}, lastPlayed:null, resetAt:null}, modes:{cuestionario:emptyMode(), practicas:emptyMode(), examen:emptyMode(), examen1:emptyMode(), examenTotal:emptyMode(), examenPersonalizado:emptyMode()}, history:[], weakQuestions:{}, questionLog:[] }; }
 function loadProgress(){ var raw=''; try{ raw=localStorage.getItem(STORAGE_KEY)||''; }catch(e){} var obj={}; if(raw){ try{ obj=JSON.parse(raw); }catch(e2){ obj={}; } } return ensureProgressShape(obj); }
 function saveProgress(){ saveLocalProgress(); saveProgressToCloud(false); }
 function resetSubjectProgress(subjectShort){
@@ -3176,22 +3188,26 @@ function init(){ createAuthUi(); updateAuthUi(); setupFirebase(); applySavedThem
   els.progressBtn.addEventListener('click', function(){ if(state.subject && state.subject.short){ state.progressSubject=state.subject.short; } else if(!state.progressSubject){ state.progressSubject=(getAvailableSubjects()[0] ? getAvailableSubjects()[0].short : 'PIICT'); } renderProgress(); });
 
   /* ── SINCRONIZACIÓN MANUAL + AUTO ── */
-  var syncBtnOriginalHtml='';
+  function setSyncState(state, label){
+    var btn=els.syncTopBtn; if(!btn) return;
+    btn.classList.remove('state-idle','state-syncing','state-ok','state-error','state-warn');
+    btn.classList.add('state-'+state);
+    var lbl=btn.querySelector('.sync-label'); if(lbl) lbl.textContent=' '+(label||'');
+  }
   async function doManualSync(){
     if(!els.syncTopBtn) return;
-    if(syncBtnOriginalHtml==='') syncBtnOriginalHtml=els.syncTopBtn.innerHTML;
     if(!authReady || !auth || !db){
-      els.syncTopBtn.innerHTML='&#x26A0;<span class="tb-label"> Firebase no listo</span>';
-      setTimeout(function(){ els.syncTopBtn.innerHTML=syncBtnOriginalHtml; },2200);
+      setSyncState('warn','Firebase no listo');
+      setTimeout(function(){ setSyncState('idle','Sincronizar'); },2200);
       return;
     }
     if(!auth.currentUser){
-      els.syncTopBtn.innerHTML='&#x26A0;<span class="tb-label"> Inicia sesión con Google</span>';
-      setTimeout(function(){ els.syncTopBtn.innerHTML=syncBtnOriginalHtml; },2600);
+      setSyncState('warn','Inicia sesión');
+      setTimeout(function(){ setSyncState('idle','Sincronizar'); },2600);
       return;
     }
     els.syncTopBtn.disabled=true;
-    els.syncTopBtn.innerHTML='&#x21BB;<span class="tb-label"> Sincronizando...</span>';
+    setSyncState('syncing','Sincronizando...');
     try{
       /* DIAG: capturar stats antes y después */
       function sumStats(store){
@@ -3218,17 +3234,17 @@ function init(){ createAuthUi(); updateAuthUi(); setupFirebase(); applySavedThem
       await applyCloudProgress(auth.currentUser);
       var afterLocal=sumStats(progressStore);
       console.log('[SYNC] Local después:', afterLocal);
-      els.syncTopBtn.innerHTML='&#x2705;<span class="tb-label"> '+afterLocal.sessions+'ses/'+afterLocal.answered+'resp</span>';
+      setSyncState('ok',afterLocal.sessions+'ses/'+afterLocal.answered+'resp');
       /* Alerta visible para la tablet sin devtools */
       if(typeof window!=='undefined' && window.localStorage && window.localStorage.getItem('syncDebug')==='1'){
         alert('SYNC diag\n\nCuenta: '+auth.currentUser.email+'\n\nLocal antes: '+beforeLocal.sessions+' sesiones / '+beforeLocal.answered+' respuestas en '+beforeLocal.subjects+' asignaturas\n\nNube: '+cloudStats.sessions+' sesiones / '+cloudStats.answered+' respuestas en '+cloudStats.subjects+' asignaturas (doc existe: '+snap.exists+')\n\nLocal después: '+afterLocal.sessions+' sesiones / '+afterLocal.answered+' respuestas en '+afterLocal.subjects+' asignaturas');
       }
     }catch(e){
       console.error('Sync manual falló:',e);
-      els.syncTopBtn.innerHTML='&#x274C;<span class="tb-label"> Error</span>';
+      setSyncState('error','Error');
       alert('SYNC error: '+(e && e.message?e.message:e));
     }finally{
-      setTimeout(function(){ els.syncTopBtn.disabled=false; els.syncTopBtn.innerHTML=syncBtnOriginalHtml; },1800);
+      setTimeout(function(){ els.syncTopBtn.disabled=false; setSyncState('idle','Sincronizar'); },1800);
     }
   }
   if(els.syncTopBtn) els.syncTopBtn.addEventListener('click', doManualSync);
