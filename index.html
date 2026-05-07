@@ -2515,40 +2515,88 @@ function mergeHistory(a,b){
   }
   return out;
 }
+function historyEntryKey(h){ h=h||{}; return [h.mode,h.correct,h.wrong,h.blank,h.total,h.score,h.finishedAt].join('|'); }
 function mergeProgressStores(localData, cloudData){
   var merged={};
   localData=ensureProgressShape(cloneData(localData||{}));
   cloudData=ensureProgressShape(cloneData(cloudData||{}));
   for(var i=0;i<SUBJECTS.length;i++){
     var key=SUBJECTS[i].short, ls=localData[key]||emptySubject(), cs=cloudData[key]||emptySubject();
-    var pickCloud=false;
     var ll=subjectLastPlayed(ls), cl=subjectLastPlayed(cs);
     var lr=subjectResetAt(ls), cr=subjectResetAt(cs);
-    /* 1) Reset reciente siempre gana */
-    if(cr && (!lr || cr>lr) && (!ll || cr>=ll)) pickCloud=true;
-    else if(lr && (!cr || lr>cr) && (!cl || lr>=cl)) pickCloud=false;
-    else {
-      /* 2) NUEVO: el lado con más preguntas respondidas gana (contador monotónico; nunca baja) */
-      var la=((ls.overall||{}).answered||0), ca=((cs.overall||{}).answered||0);
-      if(ca > la) pickCloud=true;
-      else if(la > ca) pickCloud=false;
-      /* 3) Empate en answered → usar lastPlayed y peso como desempates (lógica antigua) */
-      else if(cl && (!ll || cl>ll)) pickCloud=true;
-      else if(ll===cl && subjectWeight(cs)>subjectWeight(ls)) pickCloud=true;
+    /* 1) Reset reciente siempre gana: descarta completamente el otro lado */
+    if(cr && (!lr || cr>lr) && (!ll || cr>=ll)){ merged[key]=cloneData(cs); continue; }
+    if(lr && (!cr || lr>cr) && (!cl || lr>=cl)){ merged[key]=cloneData(ls); continue; }
+    /* 2) Elegir base primaria: la que tiene más respuestas (contador monotónico) */
+    var la=((ls.overall||{}).answered||0), ca=((cs.overall||{}).answered||0);
+    var primary, secondary;
+    if(ca>la){ primary=cs; secondary=ls; }
+    else if(la>ca){ primary=ls; secondary=cs; }
+    else if(cl && (!ll || cl>ll)){ primary=cs; secondary=ls; }
+    else if(ll===cl && subjectWeight(cs)>subjectWeight(ls)){ primary=cs; secondary=ls; }
+    else { primary=ls; secondary=cs; }
+    /* 3) Clonar primary como base e identificar sesiones únicas en secondary.history */
+    var mergedSubject=cloneData(primary);
+    var ov=mergedSubject.overall=mergedSubject.overall||emptySubject().overall;
+    ov.days=ov.days||{};
+    if(!mergedSubject.modes) mergedSubject.modes=emptySubject().modes;
+    var primaryKeys={};
+    var ph=primary.history||[];
+    for(var phi=0; phi<ph.length; phi++){ primaryKeys[historyEntryKey(ph[phi])]=1; }
+    var sh=secondary.history||[];
+    /* 4) Para cada sesión del secundario que no esté en primary, sumar deltas a contadores */
+    for(var shi=0; shi<sh.length; shi++){
+      var session=sh[shi]||{};
+      if(primaryKeys[historyEntryKey(session)]) continue;
+      var sessAnswered=(session.correct||0)+(session.wrong||0);
+      ov.sessions=(ov.sessions||0)+1;
+      ov.answered=(ov.answered||0)+sessAnswered;
+      ov.correct=(ov.correct||0)+(session.correct||0);
+      ov.wrong=(ov.wrong||0)+(session.wrong||0);
+      ov.blank=(ov.blank||0)+(session.blank||0);
+      ov.totalTimeMs=(ov.totalTimeMs||0)+(session.timeMs||0);
+      var dk=String(session.finishedAt||'').slice(0,10);
+      if(dk) ov.days[dk]=1;
+      var mode=session.mode||'';
+      if(mode && mergedSubject.modes[mode]){
+        var md=mergedSubject.modes[mode];
+        md.sessions=(md.sessions||0)+1;
+        md.answered=(md.answered||0)+sessAnswered;
+        md.correct=(md.correct||0)+(session.correct||0);
+        md.wrong=(md.wrong||0)+(session.wrong||0);
+        md.blank=(md.blank||0)+(session.blank||0);
+        md.totalTimeMs=(md.totalTimeMs||0)+(session.timeMs||0);
+        if(typeof session.score==='number'){
+          md.totalScore=(md.totalScore||0)+session.score;
+          if(md.bestScore===null || md.bestScore===undefined || session.score>md.bestScore) md.bestScore=session.score;
+          md.lastScore=session.score;
+        }
+      }
     }
-    var primary=pickCloud?cs:ls;
-    var secondary=pickCloud?ls:cs;
-    var pr=subjectResetAt(primary), sr=subjectResetAt(secondary), sl=subjectLastPlayed(secondary);
-    merged[key]=cloneData(primary);
-    if(!(pr && (!sr || pr>sr) && (!sl || pr>=sl))){
-      merged[key].weakQuestions=mergeWeakQuestions(primary.weakQuestions, secondary.weakQuestions);
-      merged[key].history=mergeHistory(primary.history, secondary.history);
-      /* El log NO se concatena: concatenarlo duplica eventos en cada sync
-         y no se puede deduplicar fiablemente (no hay id ni timestamp).
-         Mantenemos solo el log del lado elegido; el agregado weakQuestions
-         (que sí se fusiona con MAX) es la fuente de verdad para "falladas". */
-      merged[key].questionLog=(primary.questionLog||[]).slice(0,2000);
+    /* 5) Unir días y bestScore por modo desde el secundario */
+    if(secondary.overall && secondary.overall.days){
+      var sDays=secondary.overall.days;
+      for(var sdk in sDays){ if(Object.prototype.hasOwnProperty.call(sDays,sdk)) ov.days[sdk]=1; }
     }
+    if(secondary.modes){
+      for(var mk in secondary.modes){
+        if(!Object.prototype.hasOwnProperty.call(secondary.modes,mk)) continue;
+        if(!mergedSubject.modes[mk]) continue;
+        var sMd=secondary.modes[mk]||{}, pMd=mergedSubject.modes[mk];
+        if(typeof sMd.bestScore==='number'){
+          if(pMd.bestScore===null || pMd.bestScore===undefined || sMd.bestScore>pMd.bestScore) pMd.bestScore=sMd.bestScore;
+        }
+      }
+    }
+    /* 6) lastPlayed = MAX de ambos */
+    var pll=String((primary.overall&&primary.overall.lastPlayed)||'');
+    var sll=String((secondary.overall&&secondary.overall.lastPlayed)||'');
+    ov.lastPlayed=(sll>pll)?sll:pll;
+    /* 7) History, weakQuestions y log: fusionados como antes */
+    mergedSubject.history=mergeHistory(primary.history, secondary.history);
+    mergedSubject.weakQuestions=mergeWeakQuestions(primary.weakQuestions, secondary.weakQuestions);
+    mergedSubject.questionLog=(primary.questionLog||[]).slice(0,2000);
+    merged[key]=mergedSubject;
   }
   return ensureProgressShape(merged);
 }
